@@ -1,6 +1,6 @@
 <?php
 
-namespace MarlincUtils\AdminBundle\Filter;
+namespace Marlinc\AdminBundle\Filter;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetaData;

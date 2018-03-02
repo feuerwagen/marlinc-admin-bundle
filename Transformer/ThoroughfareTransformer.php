@@ -6,7 +6,7 @@
  * Time: 16:51
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 class ThoroughfareTransformer implements TransformerInterface

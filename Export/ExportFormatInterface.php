@@ -6,11 +6,11 @@
  * Time: 14:23
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 use Doctrine\ORM\Query;
 use Exporter\Source\SourceIteratorInterface;
-use MarlincUtils\AdminBundle\Transformer\TransformerInterface;
+use Marlinc\AdminBundle\Transformer\TransformerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 
 interface ExportFormatInterface

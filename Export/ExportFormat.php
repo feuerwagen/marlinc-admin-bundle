@@ -6,13 +6,13 @@
  * Time: 14:59
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 
 use Doctrine\ORM\Query;
 use Exporter\Source\SourceIteratorInterface;
-use MarlincUtils\AdminBundle\Source\ComplexStructureSourceIterator;
-use MarlincUtils\AdminBundle\Transformer\TransformerInterface;
+use Marlinc\AdminBundle\Source\ComplexStructureSourceIterator;
+use Marlinc\AdminBundle\Transformer\TransformerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;

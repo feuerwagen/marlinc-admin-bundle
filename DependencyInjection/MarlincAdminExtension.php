@@ -6,7 +6,7 @@
  * Time: 14:17
  */
 
-namespace MarlincUtils\AdminBundle\DependencyInjection;
+namespace Marlinc\AdminBundle\DependencyInjection;
 
 
 use Symfony\Component\Config\FileLocator;

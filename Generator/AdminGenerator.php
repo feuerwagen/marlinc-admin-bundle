@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace MarlincUtils\AdminBundle\Generator;
+namespace Marlinc\AdminBundle\Generator;
 
 use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Sonata\AdminBundle\Model\ModelManagerInterface;

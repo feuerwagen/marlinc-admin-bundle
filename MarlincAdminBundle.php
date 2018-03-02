@@ -6,10 +6,10 @@
  * Time: 14:16
  */
 
-namespace MarlincUtils\AdminBundle;
+namespace Marlinc\AdminBundle;
 
 
-use MarlincUtils\AdminBundle\DependencyInjection\Compiler\AdminExporterCompilerPass;
+use Marlinc\AdminBundle\DependencyInjection\Compiler\AdminExporterCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

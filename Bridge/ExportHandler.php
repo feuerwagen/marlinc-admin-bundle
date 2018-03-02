@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace MarlincUtils\AdminBundle\Bridge;
+namespace Marlinc\AdminBundle\Bridge;
 
 use Exporter\Source\SourceIteratorInterface;
 use Exporter\Writer\WriterInterface;
-use MarlincUtils\AdminBundle\Export\ExportFormat;
-use MarlincUtils\AdminBundle\Writer\ComplexWriterInterface;
+use Marlinc\AdminBundle\Export\ExportFormat;
+use Marlinc\AdminBundle\Writer\ComplexWriterInterface;
 
 class ExportHandler
 {

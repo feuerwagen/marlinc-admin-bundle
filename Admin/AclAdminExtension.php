@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace MarlincUtils\AdminBundle\Admin;
+namespace Marlinc\AdminBundle\Admin;
 
 use Doctrine\DBAL\Connection;
 use Sonata\AdminBundle\Admin\AbstractAdminExtension;
@@ -20,7 +20,6 @@ use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * Admin extension filtering the list.
@@ -84,7 +83,7 @@ class AclAdminExtension extends AbstractAdminExtension
         // Find child roles
         $roles = array();
         foreach ($userRoles as $userRole) {
-            $roles[] = ($userRole instanceof RoleInterface) ? $userRole : new Role($userRole);
+            $roles[] = ($userRole instanceof Role) ? $userRole : new Role($userRole);
         }
 
         $reachableRoles = $this->roleHierarchy->getReachableRoles($roles);

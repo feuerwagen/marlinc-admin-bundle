@@ -6,11 +6,11 @@
  * Time: 14:18
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 
 use Doctrine\ORM\Query;
-use MarlincUtils\AdminBundle\Source\SummarizingSourceIterator;
+use Marlinc\AdminBundle\Source\SummarizingSourceIterator;
 
 abstract class SummarizingExportFormat extends ExportFormat implements SummarizingExportFormatInterface
 {

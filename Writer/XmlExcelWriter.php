@@ -6,7 +6,7 @@
  * Time: 16:51
  */
 
-namespace MarlincUtils\AdminBundle\Writer;
+namespace Marlinc\AdminBundle\Writer;
 
 use Liuggio\ExcelBundle\Factory;
 use PHPExcel_Cell;

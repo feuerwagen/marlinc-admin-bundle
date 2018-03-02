@@ -6,7 +6,7 @@
  * Time: 17:30
  */
 
-namespace MarlincUtils\AdminBundle\Controller;
+namespace Marlinc\AdminBundle\Controller;
 
 
 use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
@@ -72,7 +72,6 @@ class MarlincAdminController extends ExtraAdminController
      * @return Response
      *
      * @throws AccessDeniedException If access is not granted
-     * @throws \Twig_Error_Runtime
      */
     public function listAction()
     {
@@ -98,7 +97,7 @@ class MarlincAdminController extends ExtraAdminController
         // Get exporter service.
         $exporter = $this->get('marlinc.admin.exporter');
 
-        return $this->render($this->admin->getTemplate('list'), array(
+        return $this->renderWithExtraParams($this->admin->getTemplate('list'), array(
             'action' => 'list',
             'form' => $formView,
             'datagrid' => $datagrid,
@@ -112,8 +111,6 @@ class MarlincAdminController extends ExtraAdminController
      * Overridden to fix the invocation of the softdeleteable trash filter.
      *
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @throws \Twig_Error_Runtime
-     *
      * @return Response
      */
     public function trashAction()
@@ -133,7 +130,7 @@ class MarlincAdminController extends ExtraAdminController
         // set the theme for the current Admin Form
         $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
-        return $this->render($this->admin->getTemplate('trash'), array(
+        return $this->renderWithExtraParams($this->admin->getTemplate('trash'), array(
             'action'     => 'trash',
             'form'       => $formView,
             'datagrid'   => $datagrid,

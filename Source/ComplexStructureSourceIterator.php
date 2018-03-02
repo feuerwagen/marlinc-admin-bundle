@@ -6,14 +6,14 @@
  * Time: 13:57
  */
 
-namespace MarlincUtils\AdminBundle\Source;
+namespace Marlinc\AdminBundle\Source;
 
 
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Query;
 use Exporter\Exception\InvalidMethodCallException;
 use Exporter\Source\SourceIteratorInterface;
-use MarlincUtils\AdminBundle\Export\ExportFormat;
+use Marlinc\AdminBundle\Export\ExportFormat;
 
 class ComplexStructureSourceIterator implements SourceIteratorInterface
 {

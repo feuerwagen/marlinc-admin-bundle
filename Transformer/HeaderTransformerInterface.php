@@ -6,10 +6,10 @@
  * Time: 10:10
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
-use MarlincUtils\AdminBundle\Export\ExportHeader;
+use Marlinc\AdminBundle\Export\ExportHeader;
 
 interface HeaderTransformerInterface extends TransformerInterface
 {

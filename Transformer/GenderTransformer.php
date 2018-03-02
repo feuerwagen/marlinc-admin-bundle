@@ -6,9 +6,14 @@
  * Time: 17:14
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
-
+/**
+ * Class GenderTransformer
+ * TODO: Use translatable strings and contstants from UserBundle -> move to UserBundle.
+ *
+ * @package Marlinc\AdminBundle\Transformer
+ */
 class GenderTransformer implements TransformerInterface
 {
     private $genders = [

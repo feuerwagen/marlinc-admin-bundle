@@ -6,9 +6,9 @@
  * Time: 15:43
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
-use MarlincUtils\AdminBundle\Export\ExportColumn;
+use Marlinc\AdminBundle\Export\ExportColumn;
 
 class DateTransformer implements TransformerInterface
 {

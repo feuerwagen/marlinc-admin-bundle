@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace MarlincUtils\AdminBundle\Command;
+namespace Marlinc\AdminBundle\Command;
 
-use MarlincUtils\AdminBundle\Generator\AdminGenerator;
-use MarlincUtils\AdminBundle\Generator\ControllerGenerator;
+use Marlinc\AdminBundle\Generator\AdminGenerator;
+use Marlinc\AdminBundle\Generator\ControllerGenerator;
 use Sonata\AdminBundle\Command\QuestionableCommand;
 use Sonata\AdminBundle\Command\Validators;
 use Sonata\AdminBundle\Manipulator\ServicesManipulator;

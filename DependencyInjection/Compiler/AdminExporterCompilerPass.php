@@ -6,7 +6,7 @@
  * Time: 10:24
  */
 
-namespace MarlincUtils\AdminBundle\DependencyInjection\Compiler;
+namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

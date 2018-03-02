@@ -6,11 +6,11 @@
  * Time: 17:24
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MarlincUtils\AdminBundle\Export\ExportHeader;
+use Marlinc\AdminBundle\Export\ExportHeader;
 
 abstract class AbstractCollectionTransformer extends AbstractHeaderTransformer
 {

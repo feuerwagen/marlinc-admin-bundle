@@ -2,15 +2,15 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <parameters>
         <parameter key="writer.xlsx.filename">php://output</parameter>
-        <parameter key="marlinc_acl_sonata_admin_extension.acl.extension.class">MarlincUtils\AdminBundle\Admin\AclAdminExtension</parameter>
+        <parameter key="marlinc_acl_sonata_admin_extension.acl.extension.class">Marlinc\AdminBundle\Admin\AclAdminExtension</parameter>
     </parameters>
     <services>
-        <service id="sonata.exporter.writer.xlsx" class="MarlincUtils\AdminBundle\Writer\XmlExcelWriter">
+        <service id="sonata.exporter.writer.xlsx" class="Marlinc\AdminBundle\Writer\XmlExcelWriter">
             <tag name="sonata.exporter.writer"/>
             <argument type="service" id="phpexcel"/>
             <argument>%writer.xlsx.filename%</argument>
         </service>
-        <service id="marlinc.admin.exporter" class="MarlincUtils\AdminBundle\Bridge\AdminExporter">
+        <service id="marlinc.admin.exporter" class="Marlinc\AdminBundle\Bridge\AdminExporter">
             <argument type="service" id="sonata.exporter.exporter"/>
         </service>
     </services>

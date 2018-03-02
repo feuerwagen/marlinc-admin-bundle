@@ -6,7 +6,7 @@
  * Time: 16:57
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 
 class ExportHeader

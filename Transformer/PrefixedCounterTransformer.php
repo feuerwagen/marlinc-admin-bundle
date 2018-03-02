@@ -6,7 +6,7 @@
  * Time: 11:02
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 class PrefixedCounterTransformer implements TransformerInterface

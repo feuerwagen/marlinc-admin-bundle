@@ -6,12 +6,12 @@
  * Time: 15:34
  */
 
-namespace MarlincUtils\AdminBundle\Bridge;
+namespace Marlinc\AdminBundle\Bridge;
 
 use Exporter\Exporter;
 use Exporter\Source\SourceIteratorInterface;
 use Exporter\Writer\TypedWriterInterface;
-use MarlincUtils\AdminBundle\Export\ExportFormat;
+use Marlinc\AdminBundle\Export\ExportFormat;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

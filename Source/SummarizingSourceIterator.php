@@ -6,14 +6,14 @@
  * Time: 09:46
  */
 
-namespace MarlincUtils\AdminBundle\Source;
+namespace Marlinc\AdminBundle\Source;
 
 
 use Doctrine\ORM\Query;
 use Exporter\Exception\InvalidMethodCallException;
 use Exporter\Source\SourceIteratorInterface;
-use MarlincUtils\AdminBundle\Export\ExportFormat;
-use MarlincUtils\AdminBundle\Export\SummarizingExportFormatInterface;
+use Marlinc\AdminBundle\Export\ExportFormat;
+use Marlinc\AdminBundle\Export\SummarizingExportFormatInterface;
 
 /**
  * Class SummarizingSourceIterator

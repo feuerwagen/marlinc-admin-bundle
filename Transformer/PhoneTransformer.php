@@ -6,13 +6,13 @@
  * Time: 15:54
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
-use MarlincUtils\AdminBundle\Export\ExportColumn;
+use Marlinc\AdminBundle\Export\ExportColumn;
 
 class PhoneTransformer implements TransformerInterface
 {

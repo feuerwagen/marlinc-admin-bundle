@@ -6,7 +6,7 @@
  * Time: 16:32
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 interface TransformerInterface

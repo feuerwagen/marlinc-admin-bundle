@@ -6,7 +6,7 @@
  * Time: 14:16
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 
 interface SummarizingExportFormatInterface extends ExportFormatInterface

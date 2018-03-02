@@ -6,11 +6,11 @@
  * Time: 14:59
  */
 
-namespace MarlincUtils\AdminBundle\Export;
+namespace Marlinc\AdminBundle\Export;
 
 
-use MarlincUtils\AdminBundle\Transformer\HeaderTransformerInterface;
-use MarlincUtils\AdminBundle\Transformer\TransformerInterface;
+use Marlinc\AdminBundle\Transformer\HeaderTransformerInterface;
+use Marlinc\AdminBundle\Transformer\TransformerInterface;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 

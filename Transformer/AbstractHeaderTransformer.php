@@ -6,7 +6,7 @@
  * Time: 11:38
  */
 
-namespace MarlincUtils\AdminBundle\Transformer;
+namespace Marlinc\AdminBundle\Transformer;
 
 
 abstract class AbstractHeaderTransformer implements HeaderTransformerInterface

@@ -6,7 +6,7 @@
  * Time: 15:43
  */
 
-namespace MarlincUtils\AdminBundle\Admin;
+namespace Marlinc\AdminBundle\Admin;
 
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
 use Symfony\Component\Intl\Intl;

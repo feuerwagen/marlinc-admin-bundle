@@ -6,7 +6,7 @@
  * Time: 14:30
  */
 
-namespace MarlincUtils\AdminBundle\Writer;
+namespace Marlinc\AdminBundle\Writer;
 
 use Exporter\Writer\TypedWriterInterface;
 
