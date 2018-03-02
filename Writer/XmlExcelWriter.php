@@ -190,8 +190,8 @@ class XmlExcelWriter implements ComplexWriterInterface
         }
 
         // Set freeze plane below header rows.
-        $sheet->freezePaneByColumnAndRow(0, $this->position);
-        $this->singleHeaders = 'A' . ($this->position - 1);
+        $sheet->freezePane('A'.$this->position);
+        $this->singleHeaders = 'A'.($this->position - 1);
 
         // Prevent the default simple header generating code from activating.
         // That code might still be needed for some exports though.
