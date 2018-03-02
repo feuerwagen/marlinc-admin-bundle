@@ -3,6 +3,7 @@
     <parameters>
         <parameter key="writer.xlsx.filename">php://output</parameter>
         <parameter key="marlinc_acl_sonata_admin_extension.acl.extension.class">Marlinc\AdminBundle\Admin\AclAdminExtension</parameter>
+        <parameter key="phpspreadsheet.class">Marlinc\AdminBundle\Factory\PhpSpreadsheetFactory</parameter>
     </parameters>
     <services>
         <service id="sonata.exporter.writer.xlsx" class="Marlinc\AdminBundle\Writer\XmlExcelWriter">
@@ -13,5 +14,6 @@
         <service id="marlinc.admin.exporter" class="Marlinc\AdminBundle\Bridge\AdminExporter">
             <argument type="service" id="sonata.exporter.exporter"/>
         </service>
+        <service id="phpspreadsheet" class="%phpspreadsheet.class%" />
     </services>
 </container>
