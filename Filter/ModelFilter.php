@@ -6,7 +6,7 @@
  * Time: 10:49
  */
 
-namespace AppBundle\Filter;
+namespace Marlinc\AdminBundle\Filter;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
