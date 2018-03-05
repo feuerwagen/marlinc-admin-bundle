@@ -15,5 +15,9 @@
             <argument type="service" id="sonata.exporter.exporter"/>
         </service>
         <service id="phpspreadsheet" class="%phpspreadsheet.class%" />
+        <service id="marlinc.admin.filter.model" class="Marlinc\AdminBundle\Filter\ModelFilter">
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
+        </service>
     </services>
 </container>
