@@ -28,6 +28,6 @@
     "phpunit/phpunit": "^4.8"
   },
   "autoload": {
-    "psr-4": { "Marlinc\\AdminBundle\\": "" }
+    "psr-4": { "Marlinc\\AdminBundle\\": "src/" }
   }
 }

@@ -9,6 +9,7 @@
 namespace Marlinc\AdminBundle\Controller;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Symfony\Component\Form\FormRenderer;
@@ -119,6 +120,7 @@ class MarlincAdminController extends ExtraAdminController
             throw new AccessDeniedException();
         }
 
+        /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
