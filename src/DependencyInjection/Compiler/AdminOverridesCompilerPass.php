@@ -15,6 +15,12 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class AdminOverridesCompilerPass implements CompilerPassInterface
 {
+    /**
+     * Replace the default admin datagrid builder with our custom one.
+     * This enables per-entity list access checks.
+     *
+     * @param ContainerBuilder $container
+     */
     public function process(ContainerBuilder $container)
     {
         $method = 'setDatagridBuilder';
@@ -23,8 +29,10 @@ final class AdminOverridesCompilerPass implements CompilerPassInterface
             foreach ($tags as $attributes) {
                 $definition = $container->getDefinition($id);
 
-                if ($definition->hasMethodCall($method)) {
-                    continue;
+                foreach ($definition->getMethodCalls() as $call) {
+                    if ($call[0] === $method && $call[1][0] != 'sonata.admin.builder.orm_datagrid') {
+                        continue 2;
+                    }
                 }
 
                 $definition->addMethodCall($method, [new Reference('marlinc.admin.builder.orm_datagrid')]);
