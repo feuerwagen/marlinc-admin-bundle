@@ -19,7 +19,7 @@
             <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
         </service>
         <service id="marlinc.admin.builder.orm_datagrid" class="Marlinc\AdminBundle\Datagrid\DatagridBuilder" parent="sonata.admin.builder.orm_datagrid" >
-            <argument index="4" type="service" id="sonata.admin.security.handler.role"/>
+            <argument type="service" id="sonata.admin.security.handler.role"/>
         </service>
     </services>
 </container>
