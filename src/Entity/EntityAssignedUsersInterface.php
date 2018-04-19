@@ -13,13 +13,32 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 interface EntityAssignedUsersInterface
 {
+    /**
+     * @return Collection
+     */
     public function getUsers(): Collection;
 
+    /**
+     * @param Collection $users
+     * @return self
+     */
     public function setUsers(Collection $users);
 
+    /**
+     * @param UserInterface $user
+     * @return self
+     */
     public function addUser(UserInterface $user);
 
+    /**
+     * @param UserInterface $user
+     * @return self
+     */
     public function removeUser(UserInterface $user);
 
-    public function hasUser(UserInterface $user);
+    /**
+     * @param UserInterface $user
+     * @return bool
+     */
+    public function hasUser(UserInterface $user): bool;
 }

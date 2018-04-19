@@ -59,15 +59,15 @@ class AssignedUserVoter extends Voter
         }
 
         // Vote only on entities with an admin class.
-        if (($admin = $this->adminPool->getAdminByClass(get_class($subject))) !== null) {
+        if (($admin = $this->adminPool->getAdminByClass(get_class($subject))) === null) {
             return false;
         }
 
         $role = $this->securityHandler->getBaseRole($admin);
         $roles = [];
 
-        foreach ($this->attributes as $attribute) {
-            $roles[] = sprintf($role, $attribute);
+        foreach ($this->attributes as $attr) {
+            $roles[] = sprintf($role, $attr);
         }
 
         return in_array($attribute, $roles);
