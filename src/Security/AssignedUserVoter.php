@@ -19,12 +19,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AssignedUserVoter extends Voter
 {
-    private $attributes = [
-        'VIEW',
-        'LIST',
-        'EDIT',
-        'DELETE'
-    ];
+    /**
+     * @var string[]
+     */
+    private $attributes;
 
     /**
      * @var AccessDecisionManagerInterface
@@ -41,11 +39,34 @@ class AssignedUserVoter extends Voter
      */
     private $securityHandler;
 
+    /**
+     * AssignedUserVoter constructor.
+     *
+     * @param AccessDecisionManagerInterface $decisionManager
+     * @param SecurityHandlerInterface $securityHandler
+     * @param Pool $adminPool
+     */
     public function __construct(AccessDecisionManagerInterface $decisionManager, SecurityHandlerInterface $securityHandler, Pool $adminPool)
     {
         $this->decisionManager = $decisionManager;
         $this->securityHandler = $securityHandler;
         $this->adminPool = $adminPool;
+        $this->attributes = [
+            'VIEW',
+            'LIST',
+            'EDIT',
+            'DELETE'
+        ];
+    }
+
+    /**
+     * @param string $attribute
+     * @return AssignedUserVoter
+     */
+    public function addAttribute(string $attribute): AssignedUserVoter
+    {
+        $this->attributes[] = $attribute;
+        return $this;
     }
 
     /**
