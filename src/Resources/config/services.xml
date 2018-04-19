@@ -21,5 +21,11 @@
         <service id="marlinc.admin.builder.orm_datagrid" class="Marlinc\AdminBundle\Datagrid\DatagridBuilder" parent="sonata.admin.builder.orm_datagrid" >
             <argument type="service" id="sonata.admin.security.handler.role"/>
         </service>
+        <service id="Marlinc\AdminBundle\Security\AssignedUserVoter">
+            <tag name="security.voter"/>
+            <argument type="service" id="Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface" />
+            <argument type="service" id="sonata.admin.security.handler.role" />
+            <argument type="service" id="sonata.admin.pool" />
+        </service>
     </services>
 </container>
