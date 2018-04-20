@@ -53,7 +53,6 @@ class AssignedUserVoter extends Voter
         $this->adminPool = $adminPool;
         $this->attributes = [
             'VIEW',
-            'LIST',
             'EDIT',
             'DELETE'
         ];

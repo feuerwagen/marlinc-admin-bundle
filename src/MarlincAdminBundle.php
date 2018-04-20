@@ -10,7 +10,6 @@ namespace Marlinc\AdminBundle;
 
 
 use Marlinc\AdminBundle\DependencyInjection\Compiler\AdminExporterCompilerPass;
-use Marlinc\AdminBundle\DependencyInjection\Compiler\AdminOverridesCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -22,6 +21,5 @@ class MarlincAdminBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new AdminExporterCompilerPass());
-        $container->addCompilerPass(new AdminOverridesCompilerPass());
     }
 }

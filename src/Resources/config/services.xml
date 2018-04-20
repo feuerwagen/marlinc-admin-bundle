@@ -18,8 +18,10 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
         </service>
-        <service id="marlinc.admin.builder.orm_datagrid" class="Marlinc\AdminBundle\Datagrid\DatagridBuilder" parent="sonata.admin.builder.orm_datagrid" >
-            <argument type="service" id="sonata.admin.security.handler.role"/>
+        <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension">
+            <tag name="sonata.admin.extension" global="true" />
+            <argument type="service" id="security.token_storage"/>
+            <argument type="service" id="security.authorization_checker"/>
         </service>
         <service id="Marlinc\AdminBundle\Security\AssignedUserVoter">
             <tag name="security.voter"/>
