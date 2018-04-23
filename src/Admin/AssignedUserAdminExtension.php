@@ -45,9 +45,11 @@ class AssignedUserAdminExtension extends AbstractAdminExtension
      */
     public function configureQuery(AdminInterface $admin, ProxyQueryInterface $query, $context = 'list')
     {
+        $entityClass = $admin->getClass();
+
         // Skip if current entity class does not implement interface OR user is super admin
         if (
-            !in_array(EntityAssignedUsersInterface::class, class_implements($admin->getClass()))
+            !in_array(EntityAssignedUsersInterface::class, class_implements($entityClass))
             || $this->authChecker->isGranted('ROLE_SUPER_ADMIN')
         ) {
             return;
@@ -58,9 +60,14 @@ class AssignedUserAdminExtension extends AbstractAdminExtension
 
         // Require join to user entity > get alias for parent entity and user table
         // Add condition to query to check for required relation to current user
-        $root = current($query->getRootAliases());
+        $alias = current($query->getRootAliases());
+
+        foreach ($entityClass::getParents() as $parent) {
+            $query->innerJoin($alias.'.'.$parent, 'a'.$parent);
+            $alias = 'a'.$parent;
+        }
         $query
-            ->innerJoin($root.'.users', 'ausers')
+            ->innerJoin($alias.'.users', 'ausers')
             ->andWhere('ausers = :user')
             ->setParameter('user', $user);
     }
