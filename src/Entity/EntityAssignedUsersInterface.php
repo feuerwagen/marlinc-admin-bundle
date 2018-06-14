@@ -15,10 +15,11 @@ interface EntityAssignedUsersInterface
 {
     /**
      * Return an array of field names leading to the parent entity which holds the user association.
+     * If not applicable, return null.
      *
-     * @return array
+     * @return array|null
      */
-    public static function getParents(): array;
+    public static function getParents(): ?array;
 
     /**
      * Get all assigned users.

@@ -17,9 +17,9 @@ trait GenericEntityAssignedUsersTrait
     /**
      * @inheritDoc
      */
-    public static function getParents(): array
+    public static function getParents(): ?array
     {
-        return []; // No dedicated field for parent entities.
+        return null; // No dedicated field for parent entities.
     }
 
     /**

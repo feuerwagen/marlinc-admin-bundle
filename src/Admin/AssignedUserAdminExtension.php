@@ -55,20 +55,22 @@ class AssignedUserAdminExtension extends AbstractAdminExtension
             return;
         }
 
-        // Retrieve current logged user token
-        $user = $this->tokenStorage->getToken()->getUser();
+        if (is_array($entityClass::getParents())) {
+            // Retrieve current logged user token
+            $user = $this->tokenStorage->getToken()->getUser();
 
-        // Require join to user entity > get alias for parent entity and user table
-        // Add condition to query to check for required relation to current user
-        $alias = current($query->getRootAliases());
+            // Require join to user entity > get alias for parent entity and user table
+            // Add condition to query to check for required relation to current user
+            $alias = current($query->getRootAliases());
 
-        foreach ($entityClass::getParents() as $parent) {
-            $query->innerJoin($alias.'.'.$parent, 'a'.$parent);
-            $alias = 'a'.$parent;
+            foreach ($entityClass::getParents() as $parent) {
+                $query->innerJoin($alias.'.'.$parent, 'a'.$parent);
+                $alias = 'a'.$parent;
+            }
+            $query
+                ->innerJoin($alias.'.users', 'ausers')
+                ->andWhere('ausers = :user')
+                ->setParameter('user', $user);
         }
-        $query
-            ->innerJoin($alias.'.users', 'ausers')
-            ->andWhere('ausers = :user')
-            ->setParameter('user', $user);
     }
 }
