@@ -1,0 +1,77 @@
+<table class="table">
+    <tbody>
+    {% for nested_group_field in form.children -%}
+        <tr>
+            <td style="vertical-align: middle;">
+                {% if nested_group_field['_delete'] is defined %}
+                    {{ form_row(nested_group_field['_delete'], {'label': 'action_delete', 'translation_domain': 'SonataAdminBundle'}) }}
+                {% endif %}
+            </td>
+            <td style="vertical-align: middle;">
+                {{ associationAdmin.subject }}
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_{{ associationAdmin.uniqid }}">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'message_close'|trans({}, 'SonataCoreBundle') }}"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">{{ associationAdmin.subject }}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="nav-tabs-custom">
+                                    <ul class="nav nav-tabs">
+                                        {% for name, form_group in associationAdmin.formgroups %}
+                                            <li class="{% if loop.first %}active{% endif %}">
+                                                <a
+                                                        href="#{{ associationAdmin.uniqid }}_{{ loop.parent.loop.index }}_{{ loop.index }}"
+                                                        data-toggle="tab"
+                                                >
+                                                    <i class="icon-exclamation-sign has-errors hide"></i>
+                                                    {{ associationAdmin.trans(name, {}, form_group.translation_domain) }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        {% for name, form_group in associationAdmin.formgroups %}
+                                            <div
+                                                    class="tab-pane {% if loop.first %}active{% endif %}"
+                                                    id="{{ associationAdmin.uniqid }}_{{ loop.parent.loop.index }}_{{ loop.index }}"
+                                            >
+                                                <fieldset>
+                                                    <div class="sonata-ba-collapsed-fields">
+                                                        {% for field_name in form_group.fields if nested_group_field.children[field_name] is defined %}
+                                                            {% set nested_field = nested_group_field.children[field_name] %}
+                                                            <div class="sonata-ba-field-{{ id }}-{{ field_name }}">
+                                                                {% if associationAdmin.formfielddescriptions[field_name] is defined %}
+                                                                    {{ form_row(nested_field, {
+                                                                        'inline': 'natural',
+                                                                        'edit'  : 'inline'
+                                                                    }) }}
+                                                                    {% set dummy = nested_group_field.setrendered %}
+                                                                {% else %}
+                                                                    {{ form_row(nested_field) }}
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#" class="btn btn-success" data-dismiss="modal">{{ 'message_close'|trans({}, 'SonataCoreBundle') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td style="vertical-align: middle;">
+                <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modal_{{ associationAdmin.uniqid }}">{{ 'action_edit'|trans({}, 'SonataAdminBundle') }}</a>
+            </td>
+        </tr>
+    {%- endfor %}
+    </tbody>
+</table>

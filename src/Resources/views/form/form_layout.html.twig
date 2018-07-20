@@ -48,3 +48,7 @@
         {{- block('form_widget_simple') -}}
     {%- endif %}
 {%- endblock tel_widget %}
+
+{% block sonata_admin_orm_one_to_many_widget %}
+    {% include '@MarlincAdmin/edit/edit_one_to_many.html.twig' %}
+{% endblock %}
