@@ -12,10 +12,24 @@ namespace Marlinc\AdminBundle\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class MarlincAdminExtension extends Extension
+class MarlincAdminExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container): void
+    {
+        if ($container->hasExtension('sonata_doctrine_orm_admin')) {
+            // add custom form widgets
+            $container->prependExtensionConfig('sonata_doctrine_orm_admin', [
+                'templates' => ['form' => ['@MarlincAdmin/form/form_layout.html.twig']]
+            ]);
+        }
+    }
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader(

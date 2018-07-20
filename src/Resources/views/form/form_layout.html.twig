@@ -1,0 +1,50 @@
+{% extends '@SonataDoctrineORMAdmin/Form/form_admin_fields.html.twig' %}
+
+{% block file_widget -%}
+    {{ block('form_widget') }}
+    {% if file_url is defined and file_url is not null %}
+        <a href="{{ asset(file_url) }}" target="_blank">{% trans %}Vorhandene Datei anzeigen{% endtrans %}</a>
+    {% endif %}
+{%- endblock file_widget %}
+
+{% block datetime_widget %}
+    {% spaceless %}
+        {% if widget == 'single_text' %}
+            {{ block('form_widget_simple') }}
+        {% else %}
+            {% set attr = attr|merge({'class': attr.class|default('') ~ ' row' }) %}
+            <div {{ block('widget_container_attributes') }}>
+                {{ form_errors(form.date) }}
+                {{ form_errors(form.time) }}
+
+                {% if form.date.vars.widget == 'single_text' %}
+                    <div class="col-sm-7">
+                        {{ form_widget(form.date) }}
+                    </div>
+                {% else %}
+                    {{ form_widget(form.date, {'row': false, 'input_wrapper_class': 'col-sm-7'}) }}
+                {% endif %}
+
+                {% if form.time.vars.widget == 'single_text' %}
+                    <div class="col-sm-5">
+                        {{ form_widget(form.time) }}
+                    </div>
+                {% else %}
+                    {{ form_widget(form.time, {'row': false, 'input_wrapper_class': 'col-sm-5'}) }}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock datetime_widget %}
+
+{% block tel_widget -%}
+    {% if widget is constant('Misd\\PhoneNumberBundle\\Form\\Type\\PhoneNumberType::WIDGET_COUNTRY_CHOICE') %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) %}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_widget(form.country, {'attr':{'data-width':'29.5%','style':'width:29.5%'}}) -}}
+            {{- form_widget(form.number, {'attr':{'style':'width:70%'}}) -}}
+        </div>
+    {% else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif %}
+{%- endblock tel_widget %}

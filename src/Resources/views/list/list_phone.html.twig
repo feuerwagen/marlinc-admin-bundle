@@ -1,0 +1,9 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    {% spaceless %}
+        {% if value is not null %}
+            {{ value|phone_number_format('INTERNATIONAL') }}
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    {% spaceless %}
+        {% if value is not null %}
+            <a href="{{ asset(value.path) }}" target="_blank">{{ "View file"|trans }}</a>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

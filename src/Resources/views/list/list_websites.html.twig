@@ -1,0 +1,15 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    {% spaceless %}
+        {% if value is empty %}
+            &nbsp;
+        {% elseif value is iterable %}
+            {% for link in value %}
+                <a href="{{ link }}" target="_blank">{{ link }}</a><br>
+            {% endfor %}
+        {% else %}
+            {{ value }}
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
