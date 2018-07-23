@@ -30,7 +30,10 @@
             <argument type="service" id="sonata.admin.pool" />
         </service>
         <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
+            <argument>%doctrine.dbal.connection_factory.types%</argument>
             <tag name="sonata.admin.guesser.orm_list" />
+        </service>
+        <service id="Marlinc\AdminBundle\Builder\ListBuilder" parent="sonata.admin.builder.orm_list">
         </service>
     </services>
 </container>
