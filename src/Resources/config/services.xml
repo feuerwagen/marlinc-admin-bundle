@@ -29,5 +29,8 @@
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
         </service>
+        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
+            <tag name="sonata.admin.guesser.orm_list" />
+        </service>
     </services>
 </container>
