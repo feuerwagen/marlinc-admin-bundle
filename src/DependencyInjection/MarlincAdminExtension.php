@@ -28,6 +28,13 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                 'templates' => ['form' => ['@MarlincAdmin/form/form_layout.html.twig']]
             ]);
         }
+
+        if ($container->hasExtension('picoss_sonata_extra_admin')) {
+            // add custom form widgets
+            $container->prependExtensionConfig('picoss_sonata_extra_admin', [
+                'templates' => ['trash' => ['@MarlincAdmin/list/trash.html.twig']]
+            ]);
+        }
     }
 
     public function load(array $configs, ContainerBuilder $container)

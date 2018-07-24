@@ -111,8 +111,9 @@ class MarlincAdminController extends ExtraAdminController
      * Return the Response object associated to the trash action.
      * Overridden to fix the invocation of the softdeleteable trash filter.
      *
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @return Response
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \Twig_Error_Runtime
      */
     public function trashAction()
     {
