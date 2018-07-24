@@ -69,7 +69,7 @@ class EnumTypeGuesser extends AbstractTypeGuesser
 
         // Get the choices from the fully qualified class name
         return new TypeGuess('choice', [
-            'choices' => $registeredEnumTypeFQCN::getChoices()
+            'choices' => $registeredEnumTypeFQCN::getReadableValues()
         ], Guess::VERY_HIGH_CONFIDENCE);
     }
 }
