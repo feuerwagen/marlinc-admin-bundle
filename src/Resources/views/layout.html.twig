@@ -1,0 +1,88 @@
+{% extends '@SonataAdmin/standard_layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}"/>
+    <link type="text/css" rel="stylesheet" href="{{ asset('vendor/simplemde/dist/simplemde.min.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {% block sonata_javascript_config %}
+        <script>
+            window.SONATA_CONFIG = {
+                CONFIRM_EXIT: {% if sonata_admin.adminPool.getOption('confirm_exit') %}true{% else %}false{% endif %},
+                USE_SELECT2: {% if sonata_admin.adminPool.getOption('use_select2') %}true{% else %}false{% endif %},
+                USE_ICHECK: {% if sonata_admin.adminPool.getOption('use_icheck') %}true{% else %}false{% endif %},
+                USE_STICKYFORMS: {% if sonata_admin.adminPool.getOption('use_stickyforms') %}true{% else %}false{% endif %}
+            };
+            window.SONATA_TRANSLATIONS = {
+                CONFIRM_EXIT: '{{ 'confirm_exit'|trans({}, 'SonataAdminBundle')|escape('js') }}'
+            };
+
+            // http://getbootstrap.com/getting-started/#support-ie10-width
+            if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+                var msViewportStyle = document.createElement('style');
+                msViewportStyle.appendChild(document.createTextNode('@-ms-viewport{width:auto!important}'));
+                document.querySelector('head').appendChild(msViewportStyle);
+            }
+        </script>
+    {% endblock %}
+
+    {% block sonata_javascript_pool %}
+        {% for javascript in sonata_admin.adminPool.getOption('javascripts', []) %}
+            <script src="{{ asset(javascript) }}"></script>
+        {% endfor %}
+    {% endblock %}
+
+    {% set locale = app.request.locale %}
+    {# localize moment #}
+    {% if locale[:2] != 'en' %}
+        <script src="{{ asset(
+        'bundles/sonatacore/vendor/moment/locale/' ~
+        locale|lower|replace({'_':'-'}) ~
+        '.js'
+        ) }}"></script>
+    {% endif %}
+
+    {# localize select2 #}
+    {% if sonata_admin.adminPool.getOption('use_select2') %}
+        {% if locale == 'pt' %}{% set locale = 'pt_PT' %}{% endif %}
+
+        {# omit default EN locale #}
+        {% if locale[:2] != 'en' %}
+            <script src="{{ asset('vendor/select2/dist/js/i18n/' ~ locale|replace({'_':'-'}) ~ '.js') }}"></script>
+        {% endif %}
+    {% endif %}
+
+    <script type="text/javascript" src="{{ asset('vendor/simplemde/dist/simplemde.min.js') }}"></script>
+{% endblock %}
+
+{# Remove default content in bottom sidebar. #}
+{% block side_bar_after_nav %}{% endblock %}
+
+{# Hide user menu (for now). Add a link to the frontend. #}
+{% block sonata_top_nav_menu %}
+    <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ app.request.baseUrl }}" title="Admin-Bereich verlassen">
+                    <i class="fa fa-home"></i>
+                </a>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-plus-square fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                {% include sonata_admin.adminPool.getTemplate('add_block') %}
+            </li>
+            <li class="dropdown user-menu">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                    {% include sonata_admin.adminPool.getTemplate('user_block') %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

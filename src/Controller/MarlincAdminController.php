@@ -73,6 +73,7 @@ class MarlincAdminController extends ExtraAdminController
      * @return Response
      *
      * @throws AccessDeniedException If access is not granted
+     * @throws \Twig_Error_Runtime
      */
     public function listAction()
     {
@@ -98,13 +99,13 @@ class MarlincAdminController extends ExtraAdminController
         // Get exporter service.
         $exporter = $this->get('marlinc.admin.exporter');
 
-        return $this->renderWithExtraParams($this->admin->getTemplate('list'), array(
+        return $this->renderWithExtraParams($this->admin->getTemplate('list'), [
             'action' => 'list',
             'form' => $formView,
             'datagrid' => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $exporter->getAvailableFormats($this->admin),
-        ), null);
+        ]);
     }
 
     /**
@@ -112,7 +113,7 @@ class MarlincAdminController extends ExtraAdminController
      * Overridden to fix the invocation of the softdeleteable trash filter.
      *
      * @return Response
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws AccessDeniedException
      * @throws \Twig_Error_Runtime
      */
     public function trashAction()
@@ -133,12 +134,15 @@ class MarlincAdminController extends ExtraAdminController
         // set the theme for the current Admin Form
         $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
-        return $this->renderWithExtraParams($this->admin->getTemplate('trash'), array(
+        // Get exporter service.
+        $exporter = $this->get('marlinc.admin.exporter');
+
+        return $this->renderWithExtraParams($this->admin->getTemplate('trash'), [
             'action'     => 'trash',
             'form'       => $formView,
             'datagrid'   => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => [],
-        ));
+            'export_formats' => $exporter->getAvailableFormats($this->admin),
+        ]);
     }
 }

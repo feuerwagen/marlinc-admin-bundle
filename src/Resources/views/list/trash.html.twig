@@ -1,4 +1,4 @@
-{% extends 'SonataAdminBundle:CRUD:base_list.html.twig' %}
+{% extends '@MarlincAdmin/list/base_list.html.twig' %}
 
 {% block actions %}
     <li>{% include 'SonataAdminBundle:Button:list_button.html.twig' %}</li>
@@ -95,7 +95,7 @@
                         {% endblock %}
                     {% endif %}
 
-                    {{ sonata_block_render_event('sonata.admin.list.table.bottom', { 'admin': admin }) }}
+                    {{ sonata_block_render_event('sonata.admin.trash.table.bottom', { 'admin': admin }) }}
                 </div>
                 {% block list_footer %}
                     {% if admin.datagrid.results|length > 0 %}
