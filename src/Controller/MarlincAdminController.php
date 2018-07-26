@@ -10,6 +10,7 @@ namespace Marlinc\AdminBundle\Controller;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Marlinc\AdminBundle\Admin\AdminWithTrash;
 use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Symfony\Component\Form\FormRenderer;
@@ -126,12 +127,14 @@ class MarlincAdminController extends ExtraAdminController
         $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
-        $em->getFilters()->getFilter('softdeleteabletrash')->enableForEntity($this->admin->getClass());
 
-        $datagrid = $this->admin->getDatagrid();
+        // TODO: Use datagrid for trash (with deletion date, without relations)
+        $datagrid = ($this->admin instanceof AdminWithTrash)
+            ? $this->admin->getTrashDatagrid()
+            : $this->admin->getDatagrid();
         $formView = $datagrid->getForm()->createView();
 
-        // set the theme for the current Admin Form
+        // Set the theme for the current Admin Form
         $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
         // Get exporter service.

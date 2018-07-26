@@ -31,8 +31,8 @@ class SoftDeleteableTrashFilter extends SQLFilter
     {
         $class = $targetEntity->getName();
 
-        // Classes need to be explicitly enabled.
-        if (!array_key_exists($class, $this->enabled) || $this->enabled[$class] === false) {
+        // Classes can be explicitly enabled.
+        if (!empty($this->enabled) && (!array_key_exists($class, $this->enabled) || $this->enabled[$class] === false)) {
             return '';
         }
 
@@ -54,6 +54,7 @@ class SoftDeleteableTrashFilter extends SQLFilter
             $now = $conn->quote(date('Y-m-d H:i:s')); // should use UTC in database and PHP
             $addCondSql = "({$addCondSql} OR {$targetTableAlias}.{$column} > {$now})";
         }
+
         return $addCondSql;
     }
 
