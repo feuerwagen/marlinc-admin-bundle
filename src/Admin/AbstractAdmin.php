@@ -8,19 +8,21 @@
 
 namespace Marlinc\AdminBundle\Admin;
 
-use Marlinc\AdminBundle\Datagrid\TrashMapper;
+
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
 use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
-use Sonata\AdminBundle\Builder\DatagridBuilderInterface;
-use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Intl\Intl;
 
-abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
+abstract class AbstractAdmin extends BaseAdmin
 {
+    const MODE_TRASH = 'trash';
+
+    const MODE_LIST = 'list';
+
     /**
      * The default number of results to display in the list.
      *
@@ -46,17 +48,16 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
     ];
 
     /**
-     * @var DatagridInterface
+     * The list collection.
+     *
+     * @var FieldDescriptionCollection
      */
-    private $trashDatagrid;
+    private $list;
 
     /**
-     * @var DatagridBuilderInterface
+     * @var string
      */
-    private $trashDatagridBuilder;
-
-
-    private $trashList;
+    private $datagridMode = AbstractAdmin::MODE_LIST;
 
     protected function getFilteredLanguages() {
         $languages = array_flip($this->getConfigurationPool()->getContainer()->getParameter('marlinc_languages'));
@@ -70,45 +71,34 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
         return array_intersect_key(Intl::getRegionBundle()->getCountryNames(), $countries);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getTrashList(): FieldDescriptionCollection
+    public function getList()
     {
-        $this->buildTrashList();
+        $this->buildList();
 
-        return $this->trashList;
+        return $this->list;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getTrashDatagrid(): DatagridInterface
+    public function getDatagridMode()
     {
-        $this->buildTrashDatagrid();
-
-        return $this->trashDatagrid;
+        return $this->datagridMode;
     }
 
-    public function setTrashDatagridBuilder(DatagridBuilderInterface $datagridBuilder)
+    public function setDatagridMode(string $mode)
     {
-        $this->trashDatagridBuilder = $datagridBuilder;
+        $this->datagridMode = $mode;
     }
 
-    public function getTrashDatagridBuilder()
+    public function buildDatagrid()
     {
-        return $this->trashDatagridBuilder;
-    }
-
-    private function buildTrashDatagrid()
-    {
-        if ($this->trashDatagrid) {
+        if ($this->datagrid) {
             return;
         }
 
         // Override sort.
-        $this->datagridValues['_sort_order'] = 'DESC';
-        $this->datagridValues['_sort_by'] = 'deletedAt';
+        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
+            $this->datagridValues['_sort_order'] = 'DESC';
+            $this->datagridValues['_sort_by'] = 'deletedAt';
+        }
 
         $filterParameters = $this->getFilterParameters();
 
@@ -128,13 +118,13 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
         }
 
         // initialize the datagrid
-        $this->datagrid = $this->getTrashDatagridBuilder()->getBaseDatagrid($this, $filterParameters);
+        $this->datagrid = $this->getDatagridBuilder()->getBaseDatagrid($this, $filterParameters);
 
         $this->datagrid->getPager()->setMaxPageLinks($this->maxPageLinks);
 
-        $mapper = new DatagridMapper($this->getTrashDatagridBuilder(), $this->datagrid, $this);
+        $mapper = new DatagridMapper($this->getDatagridBuilder(), $this->datagrid, $this);
 
-        // build the datagrid filter
+        // Build the datagrid filter
         $this->configureDatagridFilters($mapper);
 
         // ok, try to limit to add parent filter
@@ -157,15 +147,15 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
         }
     }
 
-    private function buildTrashList()
+    protected function buildList()
     {
-        if ($this->trashList) {
+        if ($this->list) {
             return;
         }
 
-        $this->trashList = $this->getListBuilder()->getBaseList();
+        $this->list = $this->getListBuilder()->getBaseList();
 
-        $mapper = new TrashMapper($this->getListBuilder(), $this->trashList, $this);
+        $mapper = new ListMapper($this->getListBuilder(), $this->list, $this);
 
         if (count($this->getBatchActions()) > 0) {
             $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
@@ -185,7 +175,11 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
             $mapper->add($fieldDescription, 'batch');
         }
 
-        $this->configureTrashFields($mapper);
+        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
+            $this->configureTrashFields($mapper);
+        } else {
+            $this->configureListFields($mapper);
+        }
 
         if ($this->hasRequest() && $this->getRequest()->isXmlHttpRequest()) {
             $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
@@ -200,9 +194,7 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
             );
 
             $fieldDescription->setAdmin($this);
-            // NEXT_MAJOR: Remove this line and use commented line below it instead
-            $fieldDescription->setTemplate($this->getTemplate('select'));
-            // $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('select'));
+            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('select'));
 
             $mapper->add($fieldDescription, 'select');
         }
@@ -210,12 +202,5 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
 
     protected function configureTrashFields(ListMapper $mapper)
     {
-    }
-
-    public function hasTrashFieldDescription(string $name): bool
-    {
-        $this->buildTrashList();
-
-        return array_key_exists($name, $this->listFieldDescriptions) ? true : false;
     }
 }

@@ -37,6 +37,5 @@
             <argument type="service" id="sonata.admin.guesser.orm_list_chain"/>
             <argument/>
         </service>
-        <service id="Marlinc\AdminBundle\Builder\TrashDatagridBuilder" parent="sonata.admin.builder.orm_datagrid" />
     </services>
 </container>
