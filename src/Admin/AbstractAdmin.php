@@ -8,6 +8,7 @@
 
 namespace Marlinc\AdminBundle\Admin;
 
+use Marlinc\AdminBundle\Datagrid\TrashMapper;
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
 use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
 use Sonata\AdminBundle\Builder\DatagridBuilderInterface;
@@ -164,7 +165,7 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
 
         $this->trashList = $this->getListBuilder()->getBaseList();
 
-        $mapper = new ListMapper($this->getListBuilder(), $this->trashList, $this);
+        $mapper = new TrashMapper($this->getListBuilder(), $this->trashList, $this);
 
         if (count($this->getBatchActions()) > 0) {
             $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
@@ -179,9 +180,7 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
             );
 
             $fieldDescription->setAdmin($this);
-            // NEXT_MAJOR: Remove this line and use commented line below it instead
-            $fieldDescription->setTemplate($this->getTemplate('batch'));
-            // $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('batch'));
+            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('batch'));
 
             $mapper->add($fieldDescription, 'batch');
         }
@@ -211,5 +210,12 @@ abstract class AbstractAdmin extends BaseAdmin implements AdminWithTrash
 
     protected function configureTrashFields(ListMapper $mapper)
     {
+    }
+
+    public function hasTrashFieldDescription(string $name): bool
+    {
+        $this->buildTrashList();
+
+        return array_key_exists($name, $this->listFieldDescriptions) ? true : false;
     }
 }

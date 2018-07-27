@@ -2,16 +2,10 @@
 
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
-use Doctrine\Common\Inflector\Inflector;
 use Marlinc\AdminBundle\Admin\AdminWithTrash;
 use Marlinc\AdminBundle\Builder\TrashDatagridBuilder;
-use Sonata\AdminBundle\Datagrid\Pager;
-use Sonata\AdminBundle\Templating\TemplateRegistry;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -26,7 +20,7 @@ class AddDependencyCallsCompilerPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
 
             if (in_array(AdminWithTrash::class, class_implements($definition->getClass()))) {
-                $definition->addMethodCall('setTrashDatagridBuilder', [TrashDatagridBuilder::class]);
+                $definition->addMethodCall('setTrashDatagridBuilder', [new Reference(TrashDatagridBuilder::class)]);
             }
         }
     }

@@ -30,4 +30,6 @@ interface AdminWithTrash
     public function setTrashDatagridBuilder(DatagridBuilderInterface $datagridBuilder);
 
     public function getTrashDatagridBuilder();
+
+    public function hasTrashFieldDescription(string $name): bool;
 }
