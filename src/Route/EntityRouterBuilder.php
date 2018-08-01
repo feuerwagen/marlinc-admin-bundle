@@ -39,6 +39,7 @@ class EntityRouterBuilder extends PathInfoBuilder implements RouteBuilderInterfa
         }
 
         if ($this->trashManager->hasReader($admin->getClass())) {
+            $collection->add('batch_trash', 'trash/batch');
             $collection->add('trash', 'trash');
             $collection->add('untrash', $admin->getRouterIdParameter() . '/untrash');
             $collection->add('realdelete', $admin->getRouterIdParameter() . '/realdelete');

@@ -32,6 +32,10 @@
     {% include '@MarlincAdmin/pager/trash_results.html.twig' %}
 {% endblock %}
 
+{% block batch_url -%}
+    {{ admin.generateUrl('batch_trash', {'filter': admin.filterParameters}) }}
+{%- endblock %}
+
 {% block exports %}
 {% endblock %}
 

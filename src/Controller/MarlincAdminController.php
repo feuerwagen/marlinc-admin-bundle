@@ -293,6 +293,13 @@ class MarlincAdminController extends ExtraAdminController
         ], null);
     }
 
+    public function batchTrashAction()
+    {
+        $this->admin->setListMode(AbstractAdmin::MODE_TRASH);
+
+        $this->batchAction();
+    }
+
     /**
      * Execute a batch delete while in trash.
      *
