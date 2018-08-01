@@ -91,7 +91,7 @@ abstract class AbstractAdmin extends BaseAdmin
         if ($this->hasRoute('untrash') && $this->hasAccess('edit')) {
             $actions['untrash'] = [
                 'label' => 'action_restore',
-                'translation_domain' => 'PicossExtraAdminBundle',
+                'translation_domain' => 'PicossSonataExtraAdminBundle',
                 'ask_confirmation' => true, // by default always true
             ];
         }
