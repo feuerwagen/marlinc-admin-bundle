@@ -299,7 +299,7 @@ class MarlincAdminController extends ExtraAdminController
             $this->admin->setDatagridMode(AbstractAdmin::MODE_TRASH);
         }
 
-        $this->batchAction();
+        return $this->batchAction();
     }
 
     /**

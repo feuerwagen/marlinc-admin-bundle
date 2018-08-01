@@ -71,6 +71,18 @@ abstract class AbstractAdmin extends BaseAdmin
         return array_intersect_key(Intl::getRegionBundle()->getCountryNames(), $countries);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getTemplate($name)
+    {
+        if ($this->datagridMode == 'trash' && $name == 'batch_confirmation') {
+            return '@MarlincAdmin/edit/bath_trash_confirmation.html.twig';
+        }
+
+        return parent::getTemplate($name);
+    }
+
     public function getBatchActions()
     {
         if ($this->datagridMode == 'list') {
