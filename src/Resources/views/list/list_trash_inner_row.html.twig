@@ -1,16 +1,22 @@
 
 {% for field_description in admin.list.elements %}
     {% if field_description.name == '_action' %}
-        {% if admin.isGranted('EDIT', object) and admin.hasRoute('edit') %}
-            <td class="sonata-ba-list-field sonata-ba-list-field-{{ field_description.type }}" objectId="{{ admin.id(object) }}">
-                <div class="btn-group">
+        <td class="sonata-ba-list-field sonata-ba-list-field-{{ field_description.type }}">
+            <div class="btn-group">
+                {% if admin.isGranted('EDIT', object) and admin.hasRoute('untrash') -%}
                     <a href="{{ admin.generateObjectUrl('untrash', object) }}" class="btn edit_link btn-sm btn-default" title="{{ 'action_restore'|trans({}, 'PicossSonataExtraAdminBundle') }}">
                         <i class="fa fa-reply"></i>
                         {{ 'action_restore'|trans({}, 'PicossSonataExtraAdminBundle') }}
                     </a>
-                </div>
-            </td>
-        {% endif %}
+                {%- endif %}
+                {% if admin.isGranted('DELETE', object) and admin.hasRoute('delete') -%}
+                    <a href="{{ admin.generateObjectUrl('delete', object) }}" class="btn edit_link btn-sm btn-danger" title="{{ 'action_real_delete'|trans({}, 'MarlincAdminBundle') }}">
+                        <i class="fa fa-times"></i>
+                        {{ 'action_real_delete'|trans({}, 'MarlincAdminBundle') }}
+                    </a>
+                {%- endif %}
+            </div>
+        </td>
     {% else %}
         {{ object|render_list_element(field_description) }}
     {% endif %}
