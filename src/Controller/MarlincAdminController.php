@@ -295,7 +295,9 @@ class MarlincAdminController extends ExtraAdminController
 
     public function batchTrashAction()
     {
-        $this->admin->setListMode(AbstractAdmin::MODE_TRASH);
+        if ($this->admin instanceof AbstractAdmin) {
+            $this->admin->setDatagridMode(AbstractAdmin::MODE_TRASH);
+        }
 
         $this->batchAction();
     }
