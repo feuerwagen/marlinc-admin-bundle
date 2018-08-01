@@ -202,5 +202,27 @@ abstract class AbstractAdmin extends BaseAdmin
 
     protected function configureTrashFields(ListMapper $mapper)
     {
+        $mapper
+            ->add('deletedAt')
+            ->add('deletedBy')
+            ->add('_action', null, [
+                'actions' => [
+                    'untrash' => [],
+                ]
+            ])
+        ;
+    }
+
+    protected function configureListFields(ListMapper $list)
+    {
+        $list
+            ->add('_action', null, [
+                'actions' => [
+                    'show' => [],
+                    'edit' => [],
+                    'delete' => [],
+                ]
+            ])
+        ;
     }
 }
