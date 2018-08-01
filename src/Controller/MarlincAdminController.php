@@ -13,9 +13,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
 use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
+use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class MarlincAdminController extends ExtraAdminController
@@ -147,6 +150,59 @@ class MarlincAdminController extends ExtraAdminController
             'datagrid'   => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $exporter->getAvailableFormats($this->admin),
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return Response
+     */
+    public function untrashAction(Request $request, $id)
+    {
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine()->getManager();
+        $em->getFilters()->disable('softdeleteable');
+        $em->getFilters()->enable('softdeleteabletrash');
+
+        $id = $request->get($this->admin->getIdParameter());
+        $object = $this->admin->getObject($id);
+
+        if (!$object) {
+            throw new NotFoundHttpException(sprintf('unable to find the object with id : %s', $id));
+        }
+
+        if ($request->getMethod() == 'POST') {
+            // check the csrf token
+            $this->validateCsrfToken('sonata.untrash');
+
+            try {
+                $object->setDeletedAt(null);
+                $object->setDeletedBy(null);
+                $this->admin->update($object);
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(['result' => 'ok']);
+                }
+
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'PicossSonataExtraAdminBundle'));
+
+            } catch (ModelManagerException $e) {
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(['result' => 'error']);
+                }
+
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'PicossSonataExtraAdminBundle'));
+            }
+
+            return new RedirectResponse($this->admin->generateUrl('list'));
+        }
+
+        return $this->renderWithExtraParams($this->admin->getTemplate('untrash'), [
+            'object'     => $object,
+            'action'     => 'untrash',
+            'csrf_token' => $this->getCsrfToken('sonata.untrash')
         ]);
     }
 }
