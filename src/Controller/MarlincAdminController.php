@@ -9,6 +9,7 @@
 namespace Marlinc\AdminBundle\Controller;
 
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
 use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
@@ -208,26 +209,6 @@ class MarlincAdminController extends ExtraAdminController
         ]);
     }
 
-    private function checkParentChildAssociation(Request $request, $object)
-    {
-        if (!($parentAdmin = $this->admin->getParent())) {
-            return;
-        }
-
-        $parentId = $request->get($parentAdmin->getIdParameter());
-
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $propertyPath = new PropertyPath($this->admin->getParentAssociationMapping());
-
-        if ($parentAdmin->getObject($parentId) !== $propertyAccessor->getValue($object, $propertyPath)) {
-            // NEXT_MAJOR: make this exception
-            @trigger_error("Accessing a child that isn't connected to a given parent is deprecated since 3.34"
-                ." and won't be allowed in 4.0.",
-                E_USER_DEPRECATED
-            );
-        }
-    }
-
     /**
      * Delete action.
      *
@@ -310,5 +291,131 @@ class MarlincAdminController extends ExtraAdminController
             'action' => 'delete',
             'csrf_token' => $this->getCsrfToken('sonata.realdelete'),
         ], null);
+    }
+
+    /**
+     * Execute a batch delete while in trash.
+     *
+     * @param ProxyQueryInterface $query
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function batchActionRealdelete(ProxyQueryInterface $query)
+    {
+        $this->admin->checkAccess('batchDelete');
+
+        $modelManager = $this->admin->getModelManager();
+
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine()->getManager();
+        $em->getFilters()->disable('softdeleteable');
+        $em->getFilters()->enable('softdeleteabletrash');
+
+        try {
+            $modelManager->batchDelete($this->admin->getClass(), $query);
+            $this->addFlash(
+                'sonata_flash_success',
+                $this->trans('flash_batch_delete_success', [], 'SonataAdminBundle')
+            );
+        } catch (ModelManagerException $e) {
+            $this->handleModelManagerException($e);
+            $this->addFlash(
+                'sonata_flash_error',
+                $this->trans('flash_batch_delete_error', [], 'SonataAdminBundle')
+            );
+        }
+
+        return $this->redirectToTrash();
+    }
+
+    /**
+     * Execute a batch delete while in trash.
+     *
+     * @param ProxyQueryInterface $query
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function batchActionUntrash(ProxyQueryInterface $query)
+    {
+        $this->admin->checkAccess('edit');
+
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine()->getManager();
+        $em->getFilters()->disable('softdeleteable');
+        $em->getFilters()->enable('softdeleteabletrash');
+
+        try {
+            $query->select('DISTINCT '.current($query->getRootAliases()));
+
+            try {
+                $i = 0;
+
+                foreach ($query->getQuery()->iterate() as $pos => $object) {
+                    $object[0]->setDeletedAt(null);
+                    $object[0]->setDeletedBy(null);
+
+                    if (0 == (++$i % 20)) {
+                        $em->flush();
+                        $em->clear();
+                    }
+                }
+
+                $em->flush();
+                $em->clear();
+            } catch (\PDOException $e) {
+                throw new ModelManagerException('', 0, $e);
+            } catch (DBALException $e) {
+                throw new ModelManagerException('', 0, $e);
+            }
+
+            $this->addFlash(
+                'sonata_flash_success',
+                $this->trans('flash_batch_untrash_success', [], 'MarlincAdminBundle')
+            );
+        } catch (ModelManagerException $e) {
+            $this->handleModelManagerException($e);
+            $this->addFlash(
+                'sonata_flash_error',
+                $this->trans('flash_batch_untrash_error', [], 'MarlincAdminBundle')
+            );
+        }
+
+        return $this->redirectToTrash();
+    }
+
+    /**
+     * Redirects the user to the list view.
+     *
+     * @return RedirectResponse
+     */
+    final protected function redirectToTrash()
+    {
+        $parameters = [];
+
+        if ($filter = $this->admin->getFilterParameters()) {
+            $parameters['filter'] = $filter;
+        }
+
+        return $this->redirect($this->admin->generateUrl('trash', $parameters));
+    }
+
+    private function checkParentChildAssociation(Request $request, $object)
+    {
+        if (!($parentAdmin = $this->admin->getParent())) {
+            return;
+        }
+
+        $parentId = $request->get($parentAdmin->getIdParameter());
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $propertyPath = new PropertyPath($this->admin->getParentAssociationMapping());
+
+        if ($parentAdmin->getObject($parentId) !== $propertyAccessor->getValue($object, $propertyPath)) {
+            // NEXT_MAJOR: make this exception
+            @trigger_error("Accessing a child that isn't connected to a given parent is deprecated since 3.34"
+                ." and won't be allowed in 4.0.",
+                E_USER_DEPRECATED
+            );
+        }
     }
 }

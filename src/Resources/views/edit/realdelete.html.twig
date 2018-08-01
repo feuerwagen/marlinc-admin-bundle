@@ -41,7 +41,7 @@ file that was distributed with this source code.
                     {% if admin.hasRoute('edit') and admin.hasAccess('edit', object) %}
                         {{ 'delete_or'|trans({}, 'SonataAdminBundle') }}
 
-                        <a class="btn btn-default" href="{{ admin.generateObjectUrl('trash', object) }}">
+                        <a class="btn btn-default" href="{{ admin.generateObjectUrl('trash') }}">
                             <i class="fa fa-cancel" aria-hidden="true"></i>
                             {{ 'link_action_cancel'|trans({}, 'MarlincAdminBundle') }}</a>
                     {% endif %}
