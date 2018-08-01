@@ -10,7 +10,7 @@
                     </a>
                 {%- endif %}
                 {% if admin.isGranted('DELETE', object) and admin.hasRoute('delete') -%}
-                    <a href="{{ admin.generateObjectUrl('delete', object) }}" class="btn edit_link btn-sm btn-danger" title="{{ 'action_real_delete'|trans({}, 'MarlincAdminBundle') }}">
+                    <a href="{{ admin.generateObjectUrl('realdelete', object) }}" class="btn edit_link btn-sm btn-danger" title="{{ 'action_real_delete'|trans({}, 'MarlincAdminBundle') }}">
                         <i class="fa fa-times"></i>
                         {{ 'action_real_delete'|trans({}, 'MarlincAdminBundle') }}
                     </a>

@@ -6,6 +6,14 @@
                 <source>action_real_delete</source>
                 <target>Delete permanently</target>
             </trans-unit>
+            <trans-unit id="message_real_delete_confirmation">
+                <source>message_real_delete_confirmation</source>
+                <target>Are you sure that you want to permanently delete the selected „%object%“ element?</target>
+            </trans-unit>
+            <trans-unit id="link_action_cancel">
+                <source>link_action_cancel</source>
+                <target>Cancel</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -205,4 +205,88 @@ class MarlincAdminController extends ExtraAdminController
             'csrf_token' => $this->getCsrfToken('sonata.untrash')
         ]);
     }
+
+    /**
+     * Delete action.
+     *
+     * @param int|string|null $id
+     *
+     * @throws NotFoundHttpException If the object does not exist
+     * @throws AccessDeniedException If access is not granted
+     * @throws \Exception
+     *
+     * @return Response|RedirectResponse
+     */
+    public function permanentDeleteAction($id)
+    {
+        $request = $this->getRequest();
+        $id = $request->get($this->admin->getIdParameter());
+
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine()->getManager();
+        $em->getFilters()->disable('softdeleteable');
+        $em->getFilters()->enable('softdeleteabletrash');
+
+        $object = $this->admin->getObject($id);
+
+        if (!$object) {
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+        }
+
+        $this->checkParentChildAssociation($request, $object);
+
+        $this->admin->checkAccess('delete', $object);
+
+        $preResponse = $this->preDelete($request, $object);
+        if (null !== $preResponse) {
+            return $preResponse;
+        }
+
+        if ('DELETE' == $this->getRestMethod()) {
+            // check the csrf token
+            $this->validateCsrfToken('sonata.realdelete');
+
+            $objectName = $this->admin->toString($object);
+
+            try {
+                $this->admin->delete($object);
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(['result' => 'ok'], 200, []);
+                }
+
+                $this->addFlash(
+                    'sonata_flash_success',
+                    $this->trans(
+                        'flash_delete_success',
+                        ['%name%' => $this->escapeHtml($objectName)],
+                        'SonataAdminBundle'
+                    )
+                );
+            } catch (ModelManagerException $e) {
+                $this->handleModelManagerException($e);
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(['result' => 'error'], 200, []);
+                }
+
+                $this->addFlash(
+                    'sonata_flash_error',
+                    $this->trans(
+                        'flash_delete_error',
+                        ['%name%' => $this->escapeHtml($objectName)],
+                        'SonataAdminBundle'
+                    )
+                );
+            }
+
+            return $this->redirectTo($object);
+        }
+
+        return $this->renderWithExtraParams($this->admin->getTemplate('realdelete'), [
+            'object' => $object,
+            'action' => 'delete',
+            'csrf_token' => $this->getCsrfToken('sonata.realdelete'),
+        ], null);
+    }
 }

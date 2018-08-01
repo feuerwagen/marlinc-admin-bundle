@@ -37,5 +37,6 @@
             <argument type="service" id="sonata.admin.guesser.orm_list_chain"/>
             <argument/>
         </service>
+        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder" parent="picoss.sonataextraadmin.route.entity" />
     </services>
 </container>
