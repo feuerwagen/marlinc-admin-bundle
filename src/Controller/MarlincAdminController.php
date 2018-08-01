@@ -217,7 +217,7 @@ class MarlincAdminController extends ExtraAdminController
      *
      * @return Response|RedirectResponse
      */
-    public function permanentDeleteAction($id)
+    public function realdeleteAction($id)
     {
         $request = $this->getRequest();
         $id = $request->get($this->admin->getIdParameter());
