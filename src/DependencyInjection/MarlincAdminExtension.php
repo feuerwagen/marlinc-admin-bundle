@@ -29,6 +29,26 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                     'layout' => '@MarlincAdmin/layout.html.twig',
                     'list' => '@MarlincAdmin/list/list.html.twig',
                     'base_list_field' => '@MarlincAdmin/list/base_list_field.html.twig',
+                ],
+                'assets' => [
+                    'remove_javascripts' => [
+                        'bundles/sonatacore/vendor/select2/select2.min.js'
+                    ],
+                    'extra_javascripts' => [
+                        'vendor/select2/dist/js/select2.full.min.js',
+                        'bundles/marlincselect2entity/js/select2entity.js'
+                    ],
+                    'remove_stylesheets' => [
+                        'bundles/sonatacore/vendor/select2/select2.css',
+                        'bundles/sonatacore/vendor/select2-bootstrap-css/select2-bootstrap.min.css',
+                        'bundles/sonataadmin/vendor/admin-lte/dist/css/AdminLTE.min.css' // Remove and re-add for correct file order
+                    ],
+                    'extra_stylesheets' => [
+                        'vendor/select2/dist/css/select2.min.css',
+                        'vendor/select2-bootstrap-theme/dist/select2-bootstrap.min.css',
+                        'bundles/sonataadmin/vendor/admin-lte/dist/css/AdminLTE.min.css',
+                        'bundles/sonatatranslation/css/sonata-translation.css'
+                    ]
                 ]
             ]);
         }
