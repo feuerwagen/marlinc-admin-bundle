@@ -38,5 +38,8 @@
             <argument/>
         </service>
         <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder" parent="picoss.sonataextraadmin.route.entity" />
+        <service id="Marlinc\AdminBundle\Form\WormExtension">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+        </service>
     </services>
 </container>
