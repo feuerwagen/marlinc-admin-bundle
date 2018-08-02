@@ -77,7 +77,7 @@ abstract class AbstractAdmin extends BaseAdmin
     public function getTemplate($name)
     {
         if ($this->datagridMode == 'trash' && $name == 'batch_confirmation') {
-            return '@MarlincAdmin/edit/bath_trash_confirmation.html.twig';
+            return '@MarlincAdmin/edit/batch_trash_confirmation.html.twig';
         }
 
         return parent::getTemplate($name);
