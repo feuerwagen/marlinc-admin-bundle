@@ -31,7 +31,7 @@ class WormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['worm'] === true) {
+        if ($options['allow_edit'] === false) {
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
                 $data = $event->getData();
                 $form = $event->getForm();
@@ -60,6 +60,6 @@ class WormExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('worm', false);
+        $resolver->setDefault('allow_edit', true);
     }
 }
