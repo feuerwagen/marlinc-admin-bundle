@@ -9,11 +9,13 @@
 namespace Marlinc\AdminBundle\Form;
 
 
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WormExtension extends AbstractTypeExtension
@@ -40,19 +42,29 @@ class WormExtension extends AbstractTypeExtension
                 // check if the object is "new"
                 // If you didn't pass any data to the form, the data is "null".
                 // This should be considered a new object
-                if ($data && !empty($data)) {
-                    $options = $form->getConfig()->getOptions();
 
-                    // Prevent infinte loop.
-                    if (isset($options['disabled']) && $options['disabled'] == true) {
-                        return;
+                if ($data instanceof Collection) {
+                    if (!$data->isEmpty()) {
+                        $this->disableFormField($form, $parent);
                     }
-                    $options['disabled'] = true;
-
-                    $parent->add($form->getName(), get_class($form->getConfig()->getType()->getInnerType()), $options);
+                } elseif ($data && !empty($data)) {
+                    $this->disableFormField($form, $parent);
                 }
             });
         }
+    }
+
+    private function disableFormField(FormInterface $form, FormInterface $parent)
+    {
+        $options = $form->getConfig()->getOptions();
+
+        // Prevent infinte loop.
+        if (isset($options['disabled']) && $options['disabled'] == true) {
+            return;
+        }
+        $options['disabled'] = true;
+
+        $parent->add($form->getName(), get_class($form->getConfig()->getType()->getInnerType()), $options);
     }
 
     /**
