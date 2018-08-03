@@ -13,6 +13,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
@@ -36,7 +37,8 @@ class DependencyExtension extends AbstractTypeExtension
     {
         $resolver->setDefaults([
             'depending-on' => null,
-            'depending-value' => null
+            'depending-value' => null,
+            'depending-comparison' => null
         ]);
     }
 
@@ -62,20 +64,27 @@ class DependencyExtension extends AbstractTypeExtension
 
             switch ($dependentOnClass) {
                 case ChoiceType::class:
-                    $attributes['data-source'] = '#'.$dependentId;
+                    $attributes['data-type'] = 'select';
+                    break;
+                case NumberType::class:
+                case IntegerType::class:
+                    $attributes['data-type'] = 'number';
                     break;
                 case TextType::class:
-                case NumberType::class:
-                    $attributes['data-source'] = '#'.$dependentId;
-                    $attributes['data-type'] = 'input';
+                    $attributes['data-type'] = 'text';
                     break;
                 case CheckboxType::class:
-                    $attributes['data-source'] = '#'.$dependentId;
                     $attributes['data-type'] = 'checkbox';
                     break;
             }
 
-            $view->vars['attr'] = array_merge_recursive($view->vars['attr'], $attributes);
+            if (isset($attributes['data-type'])) {
+                $attributes['data-source'] = '#'.$dependentId;
+                $attributes['data-value'] = (string) $options['depending-value'];
+                $attributes['data-comparison'] = $options['depending-comparison'];
+
+                $view->vars['attr'] = array_merge_recursive($view->vars['attr'], $attributes);
+            }
         }
     }
 }

@@ -36,7 +36,8 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                     ],
                     'extra_javascripts' => [
                         'vendor/select2/dist/js/select2.full.min.js',
-                        'bundles/marlincselect2entity/js/select2entity.js'
+                        'bundles/marlincselect2entity/js/select2entity.js',
+                        'bundles/marlincadmin/js/form-dependency.js'
                     ],
                     'remove_stylesheets' => [
                         'bundles/sonatacore/vendor/select2/select2.css',
