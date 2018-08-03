@@ -3,6 +3,7 @@
 {% block file_widget -%}
     {{ block('form_widget') }}
     {% if file_url is defined and file_url is not null %}
+        <img src="{{ asset(file_url) | imagine_filter(file_style) }}" />
         <a href="{{ asset(file_url) }}" target="_blank">{% trans %}Vorhandene Datei anzeigen{% endtrans %}</a>
     {% endif %}
 {%- endblock file_widget %}
