@@ -54,16 +54,24 @@ class DependencyExtension extends AbstractTypeExtension
                 $view->vars['attr'] = [];
             }
 
-            dump($view->vars);
+            foreach ($view->parent->children as $child) {
+                if ($child->vars['name'] == $dependentOn->getName()) {
+                    $dependentId = $child->vars['id'];
+                }
+            }
 
             switch ($dependentOnClass) {
                 case ChoiceType::class:
+                    $attributes['data-source'] = '#'.$dependentId;
                     break;
                 case TextType::class:
                 case NumberType::class:
-                    $attributes['data-source'] = '';
+                    $attributes['data-source'] = '#'.$dependentId;
+                    $attributes['data-type'] = 'input';
                     break;
                 case CheckboxType::class:
+                    $attributes['data-source'] = '#'.$dependentId;
+                    $attributes['data-type'] = 'checkbox';
                     break;
             }
 
