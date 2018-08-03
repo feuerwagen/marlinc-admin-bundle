@@ -41,5 +41,8 @@
         <service id="Marlinc\AdminBundle\Form\WormExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
+        <service id="Marlinc\AdminBundle\Form\DependencyExtension">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+        </service>
     </services>
 </container>
