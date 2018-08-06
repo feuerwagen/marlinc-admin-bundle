@@ -1,18 +1,23 @@
-# ACL extension for Sonata Admin
+# Admin for Marlinc Projects
 
-This bundle provides ACL list filtering for [SonataAdminBundle](https://github.com/sonata-project/SonataAdminBundle).
-When enabled, list screens only display data the logged in user has right to view.
+This bundle extends / modifies the default [SonataAdminBundle](https://github.com/sonata-project/SonataAdminBundle) and [SonataClassificationBundle](https://github.com/sonata-project/SonataClassificationBundle).
 
-This bundle is a good complementary of the SonataAdminBundle [ACL editor](http://sonata-project.org/bundles/admin/master/doc/reference/security.html#acl-editor).
+It adds the following features:
+
+- General modifications of the default styles / templates
+- Improved export functionality
+- Support for SoftDeletable / Trash / Restore
+- Access control based on users assigned to entities (in addition to roles)
+- Form extensions for common useful functions for admin forms
 
 ## Install
 
-Be sure that SonataAdminBundle is working and has [ACL enabled](http://sonata-project.org/bundles/admin/master/doc/reference/security.html#acl-and-friendsofsymfony-userbundle).
+Be sure that SonataAdminBundle and SonataClassificationBundle are working.
 
 Install this bundle using composer:
 
 ```
-composer require tilleuls/acl-sonata-admin-extension-bundle
+composer require marlinc/admin-bundle
 ```
 
 Register the bundle in your AppKernel:
@@ -24,12 +29,18 @@ public function registerBundles()
 {
     return array(
         // ...
-        new MarlincUtils\AclSonataAdminExtensionBundle\MarlincAclSonataAdminExtensionBundle(),
+        new Marlinc\MarlincAdminBundle(),
         // ...
     );
 }
 ```
 
-## Enable
+## Usage
 
-This extension is automatically enabled for all admins.
+### Classification
+
+This bundle provides three ways to classify other entities:
+
+1. **Tag**: The most basic way to add common information to an entity. Has a *context*, a *slug* and can be *enabled / disabled*.
+2. **Collection**: Supplements tags by providing a *description* field and the option to attach a *media* entity. Can also be marked as *hidden* for internal usage.
+3. **Category**: Supplements collections by providing hierarchical information (*order*, *parent*, *children*).
