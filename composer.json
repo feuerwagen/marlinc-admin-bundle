@@ -22,6 +22,7 @@
     "sonata-project/admin-bundle": "^3.20",
     "sonata-project/classification-bundle": "^3.7",
     "sonata-project/doctrine-orm-admin-bundle": "^3.4",
+    "sonata-project/translation-bundle": "^2.3",
     "symfony/dependency-injection": "^3.4",
     "symfony/form": "^3.0",
     "symfony/http-kernel": "~3.0"
