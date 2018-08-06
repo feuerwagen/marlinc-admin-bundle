@@ -15,14 +15,14 @@ use Sonata\ClassificationBundle\Entity\BaseContext;
 class Context extends BaseContext
 {
     /**
-     * @var int $id
+     * @var string $id
      */
     protected $id;
 
     /**
      * Get id.
      *
-     * @return int $id
+     * @return string $id
      */
     public function getId()
     {
