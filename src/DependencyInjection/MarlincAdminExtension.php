@@ -72,6 +72,22 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                 ]
             ]);
         }
+
+        if ($container->hasExtension('sonata_classification')) {
+            // override templates
+            $container->prependExtensionConfig('sonata_classification', [
+                'class' => [
+                    'tag' => 'Marlinc\AdminBundle\Entity\Tag',
+                    'category' => 'Marlinc\AdminBundle\Entity\Category',
+                    'collection' => 'Marlinc\AdminBundle\Entity\Collection',
+                    'context' => 'Marlinc\AdminBundle\Entity\Context',
+                ],
+                'admin' => [
+                    'category' => ['class' => 'Marlinc\AdminBundle\Admin\CategoryAdmin'],
+                    'collection' => ['class' => 'Marlinc\AdminBundle\Admin\CollectionAdmin'],
+                ],
+            ]);
+        }
     }
 
     public function load(array $configs, ContainerBuilder $container)
