@@ -83,8 +83,16 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                     'context' => 'Marlinc\AdminBundle\Entity\Context',
                 ],
                 'admin' => [
-                    'category' => ['class' => 'Marlinc\AdminBundle\Admin\CategoryAdmin'],
-                    'collection' => ['class' => 'Marlinc\AdminBundle\Admin\CollectionAdmin'],
+                    'category' => [
+                        'class' => 'Marlinc\AdminBundle\Admin\CategoryAdmin',
+                        'controller' => 'MarlincAdminBundle:CategoryAdmin'
+                    ],
+                    'collection' => [
+                        'class' => 'Marlinc\AdminBundle\Admin\CollectionAdmin',
+                        'controller' => 'MarlincAdminBundle:MarlincAdmin'
+                    ],
+                    'context' => ['controller' => 'MarlincAdminBundle:MarlincAdmin'],
+                    'tag' => ['controller' => 'MarlincAdminBundle:MarlincAdmin']
                 ],
             ]);
         }
