@@ -1,17 +1,8 @@
 <?php
 
-/*
- * This file is part of the Sonata Project package.
- *
- * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace Marlinc\AdminBundle\Controller;
 
-namespace Sonata\ClassificationBundle\Controller;
 
-use Marlinc\AdminBundle\Controller\MarlincAdminController;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
