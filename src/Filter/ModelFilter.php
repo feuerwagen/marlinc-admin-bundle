@@ -54,10 +54,10 @@ class ModelFilter extends BaseFilter
 
         if (isset($data['type']) && $data['type'] == self::TYPE_NOT_CONTAINS) {
             $subQueryBuilder = $this->em->createQueryBuilder();
-            $subQuery = $subQueryBuilder
+            $subQuery = $subQueryBuilder // TODO: Remove Client-specific code
                 ->select(['c'])
                 ->from('MarlincClientBundle:Client', 'c')
-                ->innerJoin('c.flags', 'f')
+                ->innerJoin('c.tags', 'f')
                 ->where('f.id = :flagid')
                 ->setParameter('flagid', $data['value'])
                 ->getQuery()
