@@ -11,9 +11,9 @@ namespace Marlinc\AdminBundle\Source;
 
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Query;
-use Exporter\Exception\InvalidMethodCallException;
-use Exporter\Source\SourceIteratorInterface;
 use Marlinc\AdminBundle\Export\ExportFormat;
+use Sonata\Exporter\Exception\InvalidMethodCallException;
+use Sonata\Exporter\Source\SourceIteratorInterface;
 
 class ComplexStructureSourceIterator implements SourceIteratorInterface
 {

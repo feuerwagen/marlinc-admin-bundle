@@ -11,10 +11,10 @@
 
 namespace Marlinc\AdminBundle\Bridge;
 
-use Exporter\Source\SourceIteratorInterface;
-use Exporter\Writer\WriterInterface;
 use Marlinc\AdminBundle\Export\ExportFormat;
 use Marlinc\AdminBundle\Writer\ComplexWriterInterface;
+use Sonata\Exporter\Source\SourceIteratorInterface;
+use Sonata\Exporter\Writer\WriterInterface;
 
 class ExportHandler
 {

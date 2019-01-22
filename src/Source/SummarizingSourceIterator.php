@@ -10,10 +10,10 @@ namespace Marlinc\AdminBundle\Source;
 
 
 use Doctrine\ORM\Query;
-use Exporter\Exception\InvalidMethodCallException;
-use Exporter\Source\SourceIteratorInterface;
 use Marlinc\AdminBundle\Export\ExportFormat;
 use Marlinc\AdminBundle\Export\SummarizingExportFormatInterface;
+use Sonata\Exporter\Exception\InvalidMethodCallException;
+use Sonata\Exporter\Source\SourceIteratorInterface;
 
 /**
  * Class SummarizingSourceIterator

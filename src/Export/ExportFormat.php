@@ -10,10 +10,10 @@ namespace Marlinc\AdminBundle\Export;
 
 
 use Doctrine\ORM\Query;
-use Exporter\Source\SourceIteratorInterface;
 use Marlinc\AdminBundle\Source\ComplexStructureSourceIterator;
 use Marlinc\AdminBundle\Transformer\TransformerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
+use Sonata\Exporter\Source\SourceIteratorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;

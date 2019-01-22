@@ -8,7 +8,7 @@
 
 namespace Marlinc\AdminBundle\Writer;
 
-use Exporter\Writer\TypedWriterInterface;
+use Sonata\Exporter\Writer\TypedWriterInterface;
 
 interface ComplexWriterInterface extends TypedWriterInterface
 {

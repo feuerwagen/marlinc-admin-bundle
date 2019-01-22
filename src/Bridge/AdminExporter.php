@@ -8,11 +8,11 @@
 
 namespace Marlinc\AdminBundle\Bridge;
 
-use Exporter\Exporter;
-use Exporter\Source\SourceIteratorInterface;
-use Exporter\Writer\TypedWriterInterface;
 use Marlinc\AdminBundle\Export\ExportFormat;
 use Sonata\AdminBundle\Admin\AdminInterface;
+use Sonata\Exporter\Exporter;
+use Sonata\Exporter\Source\SourceIteratorInterface;
+use Sonata\Exporter\Writer\TypedWriterInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminExporter
