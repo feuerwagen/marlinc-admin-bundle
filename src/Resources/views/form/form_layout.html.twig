@@ -39,15 +39,15 @@
 {% endblock datetime_widget %}
 
 {% block tel_widget -%}
-    {% if widget is constant('Misd\\PhoneNumberBundle\\Form\\Type\\PhoneNumberType::WIDGET_COUNTRY_CHOICE') %}
+    {#{% if widget is constant('Misd\\PhoneNumberBundle\\Form\\Type\\PhoneNumberType::WIDGET_COUNTRY_CHOICE') %}
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) %}
         <div {{ block('widget_container_attributes') }}>
             {{- form_widget(form.country, {'attr':{'data-width':'29.5%','style':'width:29.5%'}}) -}}
             {{- form_widget(form.number, {'attr':{'style':'width:70%'}}) -}}
         </div>
-    {% else -%}
+    {% else -%}#}
         {{- block('form_widget_simple') -}}
-    {%- endif %}
+    {#{%- endif %}#}
 {%- endblock tel_widget %}
 
 {% block sonata_admin_orm_one_to_many_widget %}
