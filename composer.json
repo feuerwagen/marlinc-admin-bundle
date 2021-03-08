@@ -19,7 +19,7 @@
     "phpoffice/phpspreadsheet": "^1.17",
     "picoss/sonata-extra-admin-bundle": "3.x-dev",
     "sensio/generator-bundle": "dev-master",
-    "sonata-project/admin-bundle": "dev-master",
+    "sonata-project/admin-bundle": "^3.1",
     "sonata-project/doctrine-orm-admin-bundle": "dev-master",
     "symfony/dependency-injection": "^5.2",
     "symfony/form": "^5.2",
