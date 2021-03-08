@@ -20,7 +20,7 @@
     "picoss/sonata-extra-admin-bundle": "3.x-dev",
     "symfony/maker-bundle": "^1.29",
     "sonata-project/admin-bundle": "3.x-dev",
-    "sonata-project/doctrine-orm-admin-bundle": "dev-master",
+    "sonata-project/doctrine-orm-admin-bundle": "3.x-dev",
     "symfony/dependency-injection": "^5.2",
     "symfony/form": "^5.2",
     "symfony/http-kernel": "^5.2"
