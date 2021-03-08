@@ -17,7 +17,7 @@
     "gedmo/doctrine-extensions": "^3.0",
     "giggsey/libphonenumber-for-php": "^8.12",
     "phpoffice/phpspreadsheet": "^1.17",
-    "picoss/sonata-extra-admin-bundle": "dev-master",
+    "picoss/sonata-extra-admin-bundle": "3.x-dev",
     "symfony/maker-bundle": "^1.29",
     "sonata-project/admin-bundle": "dev-master",
     "sonata-project/doctrine-orm-admin-bundle": "dev-master",
