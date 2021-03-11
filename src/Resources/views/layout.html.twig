@@ -10,10 +10,10 @@
     {% block sonata_javascript_config %}
         <script>
             window.SONATA_CONFIG = {
-                CONFIRM_EXIT: {% if sonata_admin.adminPool.getOption('confirm_exit') %}true{% else %}false{% endif %},
-                USE_SELECT2: {% if sonata_admin.adminPool.getOption('use_select2') %}true{% else %}false{% endif %},
-                USE_ICHECK: {% if sonata_admin.adminPool.getOption('use_icheck') %}true{% else %}false{% endif %},
-                USE_STICKYFORMS: {% if sonata_admin.adminPool.getOption('use_stickyforms') %}true{% else %}false{% endif %}
+                CONFIRM_EXIT: {% if sonata_config.getOption('confirm_exit') %}true{% else %}false{% endif %},
+                USE_SELECT2: {% if sonata_config.getOption('use_select2') %}true{% else %}false{% endif %},
+                USE_ICHECK: {% if sonata_config.getOption('use_icheck') %}true{% else %}false{% endif %},
+                USE_STICKYFORMS: {% if sonata_config.getOption('use_stickyforms') %}true{% else %}false{% endif %}
             };
             window.SONATA_TRANSLATIONS = {
                 CONFIRM_EXIT: '{{ 'confirm_exit'|trans({}, 'SonataAdminBundle')|escape('js') }}'
@@ -29,7 +29,7 @@
     {% endblock %}
 
     {% block sonata_javascript_pool %}
-        {% for javascript in sonata_admin.adminPool.getOption('javascripts', []) %}
+        {% for javascript in sonata_config.getOption('javascripts', []) %}
             <script src="{{ asset(javascript) }}"></script>
         {% endfor %}
     {% endblock %}
@@ -38,14 +38,14 @@
     {# localize moment #}
     {% if locale[:2] != 'en' %}
         <script src="{{ asset(
-        'bundles/sonatacore/vendor/moment/locale/' ~
-        locale|lower|replace({'_':'-'}) ~
-        '.js'
+            'bundles/sonatacore/vendor/moment/locale/' ~
+            locale|lower|replace({'_':'-'}) ~
+            '.js'
         ) }}"></script>
     {% endif %}
 
     {# localize select2 #}
-    {% if sonata_admin.adminPool.getOption('use_select2') %}
+    {% if sonata_config.getOption('use_select2') %}
         {% if locale == 'pt' %}{% set locale = 'pt_PT' %}{% endif %}
 
         {# omit default EN locale #}
@@ -73,14 +73,14 @@
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-plus-square fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
-                {% include sonata_admin.adminPool.getTemplate('add_block') %}
+                {% include get_global_template('add_block') %}
             </li>
             <li class="dropdown user-menu">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    {% include sonata_admin.adminPool.getTemplate('user_block') %}
+                    {% include get_global_template('user_block') %}
                 </ul>
             </li>
         </ul>

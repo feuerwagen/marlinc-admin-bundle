@@ -9,17 +9,23 @@
     %}
         <a class="sonata-link-identifier" href="{{ admin.generateObjectUrl(route, object, field_description.options.route.parameters) }}">
             {%- block field %}
-                {% spaceless %}
-                {% if field_description.options.collapse is defined %}
-                    {% set collapse = field_description.options.collapse %}
-                    <div class="sonata-readmore"
-                          data-readmore-height="{{ collapse.height|default(40) }}"
-                          data-readmore-more="{{ collapse.more|default('read_more')|trans({}, 'SonataAdminBundle') }}"
-                          data-readmore-less="{{ collapse.less|default('read_less')|trans({}, 'SonataAdminBundle') }}">{{ value }}</div>
-                {% else %}
-                    {{ value }}
-                {% endif %}
-                {% endspaceless %}
+                {% apply spaceless %}
+                    {% if field_description.options.collapse is defined %}
+                        {% set collapse = field_description.options.collapse %}
+                        <div class="sonata-readmore"
+                             data-readmore-height="{{ collapse.height|default(40) }}"
+                             data-readmore-more="{{ collapse.more|default('read_more')|trans({}, 'SonataAdminBundle') }}"
+                             data-readmore-less="{{ collapse.less|default('read_less')|trans({}, 'SonataAdminBundle') }}">{{ value }}</div>
+                    {% else %}
+
+                        {% if (field_description.type == 'date' or field_description.type == 'datetime' ) and value is not empty %}
+                            {{ value|date('Y-m-d', options.timezone|default(null))  }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+
+                    {% endif %}
+                {% endapply %}
             {% endblock -%}
         </a>
     {% else %}
@@ -38,7 +44,7 @@
             ) %}
 
             {% if field_description.type == 'date' and value is not empty %}
-                {% set data_value = value.format('Y-m-d') %}
+                {% set data_value = value|date('Y-m-d', options.timezone|default(null)) %}
             {% elseif field_description.type == 'boolean' and value is empty %}
                 {% set data_value = 0 %}
             {% else %}

@@ -8,7 +8,6 @@
 
 namespace Marlinc\AdminBundle\Form;
 
-
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -73,5 +72,13 @@ class WormExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('allow_edit', true);
+    }
+
+    /**
+     * Return the class of the type being extended.
+     */
+    public static function getExtendedTypes(): iterable
+    {
+        return [FormType::class];
     }
 }

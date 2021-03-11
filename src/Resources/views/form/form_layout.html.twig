@@ -3,13 +3,13 @@
 {% block file_widget -%}
     {{ block('form_widget') }}
     {% if file_url is defined and file_url is not null %}
-        <img src="{{ asset(file_url) | imagine_filter(file_style) }}" />
+        <img src="{{ asset(file_url) }}" />
         <a href="{{ asset(file_url) }}" target="_blank">{% trans %}Vorhandene Datei anzeigen{% endtrans %}</a>
     {% endif %}
 {%- endblock file_widget %}
 
 {% block datetime_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if widget == 'single_text' %}
             {{ block('form_widget_simple') }}
         {% else %}
@@ -35,7 +35,7 @@
                 {% endif %}
             </div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock datetime_widget %}
 
 {% block tel_widget -%}

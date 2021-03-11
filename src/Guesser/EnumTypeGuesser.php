@@ -8,7 +8,6 @@
 
 namespace Marlinc\AdminBundle\Guesser;
 
-
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 use Fresh\DoctrineEnumBundle\Exception\EnumTypeIsRegisteredButClassDoesNotExistException;
 use Sonata\AdminBundle\Model\ModelManagerInterface;
@@ -38,7 +37,8 @@ class EnumTypeGuesser extends AbstractTypeGuesser
     /**
      * @inheritDoc
      */
-    public function guessType($class, $property, ModelManagerInterface $modelManager)
+
+    public function guessType(string $class, string $property, ModelManagerInterface $modelManager): ?TypeGuess
     {
         if (!$ret = $this->getParentMetadataForProperty($class, $property, $modelManager)) {
             return new TypeGuess('text', [], Guess::LOW_CONFIDENCE);
@@ -50,7 +50,7 @@ class EnumTypeGuesser extends AbstractTypeGuesser
 
         // This is not one of the registered ENUM types
         if (!isset($this->registeredEnumTypes[$fieldType])) {
-            return;
+            return null;
         }
 
         $registeredEnumTypeFQCN = $this->registeredEnumTypes[$fieldType];
@@ -64,7 +64,7 @@ class EnumTypeGuesser extends AbstractTypeGuesser
         }
 
         if (!\is_subclass_of($registeredEnumTypeFQCN, AbstractEnumType::class)) {
-            return;
+            return null;
         }
 
         // Get the choices from the fully qualified class name

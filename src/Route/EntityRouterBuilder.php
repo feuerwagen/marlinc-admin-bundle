@@ -2,47 +2,29 @@
 
 namespace Marlinc\AdminBundle\Route;
 
-use Picoss\SonataExtraAdminBundle\Model\TrashManagerInterface;
-use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\RouteBuilderInterface;
+use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Route\PathInfoBuilder;
-use Sonata\AdminBundle\Route\RouteCollection;
 
-class EntityRouterBuilder extends PathInfoBuilder implements RouteBuilderInterface
+class EntityRouterBuilder implements RouteBuilderInterface
 {
     /**
-     * @var TrashManagerInterface
+     * @var AuditManagerInterface
      */
-    protected $trashManager;
+    private $manager;
 
-    /**
-     * @param \Sonata\AdminBundle\Model\AuditManagerInterface $manager
-     * @param TrashManagerInterface $trashManager
-     */
-    public function __construct(AuditManagerInterface $manager, TrashManagerInterface $trashManager)
+    public function __construct(AuditManagerInterface $manager)
     {
-        parent::__construct($manager);
-
-        $this->trashManager = $trashManager;
+        $this->manager = $manager;
     }
-    /**
-     * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
-     * @param \Sonata\AdminBundle\Route\RouteCollection $collection
-     */
-    public function build(AdminInterface $admin, RouteCollection $collection)
+
+    public function build(AdminInterface $admin, RouteCollectionInterface $collection,PathInfoBuilder $pathInfoBuilder): void
     {
-        parent::build($admin, $collection);
+        $pathInfoBuilder->build($admin, $collection);
 
         if ($this->manager->hasReader($admin->getClass())) {
             $collection->add('history_revert', $admin->getRouterIdParameter() . '/history/{revision}/revert');
-        }
-
-        if ($this->trashManager->hasReader($admin->getClass())) {
-            $collection->add('batch_trash', 'trash/batch');
-            $collection->add('trash', 'trash');
-            $collection->add('untrash', $admin->getRouterIdParameter() . '/untrash');
-            $collection->add('realdelete', $admin->getRouterIdParameter() . '/realdelete');
         }
     }
 }
