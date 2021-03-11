@@ -13,7 +13,6 @@ file that was distributed with this source code.
 
 {%- block actions -%}
     {% include '@SonataAdmin/CRUD/action_buttons.html.twig' %}
-    <li>{% include '@PicossSonataExtraAdmin/Button/trash_button.html.twig' %}</li>a
 {%- endblock -%}
 
 {%- block tab_menu -%}
@@ -25,7 +24,7 @@ file that was distributed with this source code.
 
 {% block title %}
     {% if admin.isChild and admin.parent.subject %}
-        {{ "title_edit"|trans({'%name%': admin.parent.toString(admin.parent.subject)|truncate(15) }, 'SonataAdminBundle') }}
+        {{ "title_edit"|trans({'%name%': admin.parent.toString(admin.parent.subject)|u.truncate(15) }, 'SonataAdminBundle') }}
     {% endif %}
 {% endblock %}
 
@@ -68,13 +67,15 @@ file that was distributed with this source code.
                                             {% set sortable = false %}
                                             {% if field_description.options.sortable is defined and field_description.options.sortable %}
                                                 {% set sortable             = true %}
-                                                {% set sort_parameters      = admin.modelmanager.sortparameters(field_description, admin.datagrid) %}
-                                                {% set current              = admin.datagrid.values._sort_by == field_description or admin.datagrid.values._sort_by.name == sort_parameters.filter._sort_by %}
+                                                {% set sort_parameters      = admin.datagrid.sortparameters(field_description) %}
+                                                {% set current              = admin.datagrid.values._sort_by is defined
+                                                    and (admin.datagrid.values._sort_by == field_description
+                                                    or admin.datagrid.values._sort_by.name == sort_parameters.filter._sort_by) %}
                                                 {% set sort_active_class    = current ? 'sonata-ba-list-field-order-active' : '' %}
                                                 {% set sort_by              = current ? admin.datagrid.values._sort_order : field_description.options._sort_order %}
                                             {% endif %}
 
-                                            {% spaceless %}
+                                            {% apply spaceless %}
                                                 <th class="sonata-ba-list-field-header-{{ field_description.type}} {% if sortable %} sonata-ba-list-field-header-order-{{ sort_by|lower }} {{ sort_active_class }}{% endif %}{% if field_description.options.header_class is defined %} {{ field_description.options.header_class }}{% endif %}"{% if field_description.options.header_style is defined %} style="{{ field_description.options.header_style }}"{% endif %}>
                                                     {% if sortable %}<a href="{{ admin.generateUrl('list', sort_parameters) }}">{% endif %}
                                                         {% if field_description.getOption('label_icon') %}
@@ -83,7 +84,7 @@ file that was distributed with this source code.
                                                         {{ field_description.label|trans({}, field_description.translationDomain) }}
                                                         {% if sortable %}</a>{% endif %}
                                                 </th>
-                                            {% endspaceless %}
+                                            {% endapply %}
                                         {% endif %}
                                     {% endfor %}
                                 </tr>
@@ -164,10 +165,10 @@ file that was distributed with this source code.
                                                 <label class="checkbox" for="{{ admin.uniqid }}_all_elements">
                                                     <input type="checkbox" name="all_elements" id="{{ admin.uniqid }}_all_elements">
                                                     {{ 'all_elements'|trans({}, 'SonataAdminBundle') }}
-                                                    ({{ admin.datagrid.pager.nbresults }})
+                                                    ({{ admin.datagrid.pager.countResults() }})
                                                 </label>
 
-                                                <select name="action" style="width: auto; height: auto" data-width="auto" class="form-control">
+                                                <select name="action" style="width: auto; height: auto" class="form-control">
                                                     {% for action, options in batchactions %}
                                                         <option value="{{ action }}">{{ options.label|trans({}, options.translation_domain|default(admin.translationDomain)) }}</option>
                                                     {% endfor %}
@@ -189,16 +190,14 @@ file that was distributed with this source code.
                                                         <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        {% for name, format in export_formats %}
-                                                        {% for type in format.filetypes %}
-                                                        <li>
-                                                            <a href="{{ admin.generateUrl('export', admin.modelmanager.paginationparameters(admin.datagrid, 0) + {'format' : name, 'filetype' : type}) }}">
-                                                                <i class="fa fa-arrow-circle-o-down"></i>
-                                                                {{- ("export_format_" ~ name)|trans({}, 'SonataAdminBundle') }} {{ type|upper -}}
-                                                            </a>
-                                                        <li>
-                                                            {% endfor %}
-                                                            {% endfor %}
+                                                        {% for format in export_formats %}
+                                                            <li>
+                                                                <a href="{{ admin.generateUrl('export', admin.datagrid.paginationparameters(0) + {'format' : format}) }}">
+                                                                    <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i>
+                                                                    {{ ("export_format_" ~ format)|trans({}, 'SonataAdminBundle') }}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
                                                     </ul>
                                                 </div>
 
@@ -229,7 +228,8 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block list_filters_actions %}
-    {%- if admin.datagrid.filters|length %}
+    {% set displayableFilters = admin.datagrid.filters|filter(filter => filter.options['show_filter'] is not same as (false)) %}
+    {%- if displayableFilters|length %}
         <ul class="nav navbar-nav navbar-right">
 
             <li class="dropdown sonata-actions">
@@ -241,11 +241,14 @@ file that was distributed with this source code.
                 </a>
 
                 <ul class="dropdown-menu" role="menu">
-                    {% for filter in admin.datagrid.filters if (filter.options['show_filter'] is same as(true) or filter.options['show_filter'] is null) %}
-                        {% set filterActive = ((filter.isActive() or filter.options['show_filter']) and not admin.isDefaultFilter(filter.formName)) %}
+                    {% for filter in displayableFilters %}
+                        {% set filterDisplayed = filter.isActive() or filter.options['show_filter'] is same as (true) %}
                         <li>
                             <a href="#" class="sonata-toggle-filter sonata-ba-action" filter-target="filter-{{ admin.uniqid }}-{{ filter.name }}" filter-container="filter-container-{{ admin.uniqid() }}">
-                                <i class="fa {{ (filter.isActive() or filter.options['show_filter']) ? 'fa-check-square-o' : 'fa-square-o' }}"></i>{{ filter.label|trans({}, filter.translationDomain ?: admin.translationDomain) }}
+                                <i class="fa {{ filterDisplayed ? 'fa-check-square-o' : 'fa-square-o' }}"></i>
+                                {% if filter.label is not same as(false) %}
+                                    {{ filter.label|trans(filter.options['label_translation_parameters']|default({}), filter.translationDomain ?: admin.translationDomain) }}
+                                {% endif %}
                             </a>
                         </li>
                     {% endfor %}

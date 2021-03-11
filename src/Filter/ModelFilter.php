@@ -135,10 +135,7 @@ final class ModelFilter extends Filter
         return $alias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOptions()
+    public function getDefaultOptions() :array
     {
         return array(
             'mapping_type' => false,
