@@ -33,9 +33,11 @@
             <argument>%doctrine.dbal.connection_factory.types%</argument>
             <tag name="sonata.admin.guesser.orm_list" />
         </service>
-        <service id="sonata.admin.builder.orm_list" class="Marlinc\AdminBundle\Builder\ListBuilder">
-            <argument type="service" id="sonata.admin.guesser.orm_list_chain"/>
-            <argument/>
+        <service id="sonata.admin.builder.orm_list" class="Sonata\DoctrineORMAdminBundle\Builder\ListBuilder">
+            <argument type="service" id="sonata.admin.guesser.orm_list_chain"/><argument/>
+        </service>
+        <service id="Marlinc\AdminBundle\Builder\ListBuilder" class="Marlinc\AdminBundle\Builder\ListBuilder"  decorates="sonata.admin.builder.orm_list">
+            <argument type="service" id=".inner"/>
         </service>
         <service id="Marlinc\AdminBundle\Form\WormExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
