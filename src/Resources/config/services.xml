@@ -35,6 +35,7 @@
         </service>
         <service id="sonata.admin.builder.orm_list" class="Sonata\DoctrineORMAdminBundle\Builder\ListBuilder">
             <argument type="service" id="sonata.admin.guesser.orm_list_chain"/><argument/>
+            <argument>[ARRAY]</argument>
         </service>
         <service id="Marlinc\AdminBundle\Builder\ListBuilder" class="Marlinc\AdminBundle\Builder\ListBuilder"  decorates="sonata.admin.builder.orm_list">
             <argument type="service" id=".inner"/>
