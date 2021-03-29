@@ -35,7 +35,7 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
         </service>
         <service id="Sonata\DoctrineORMAdminBundle\FieldDescription\TypeGuesser" />
-        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser"  decorates="onata\DoctrineORMAdminBundle\FieldDescription\TypeGuesser">
+        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser"  decorates="Sonata\DoctrineORMAdminBundle\FieldDescription\TypeGuesser">
             <argument type="service" id=".inner"/>
             <argument>%doctrine.dbal.connection_factory.types%</argument>
             <tag name="sonata.admin.guesser.orm_list" />
