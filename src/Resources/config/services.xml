@@ -29,9 +29,10 @@
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
         </service>
-        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
-            <argument>%doctrine.dbal.connection_factory.types%</argument>
-            <tag name="sonata.admin.guesser.orm_list" />
+        <service id="sonata.admin.guesser.orm_list" class="Sonata\DoctrineORMAdminBundle\FieldDescription\TypeGuesser"/>
+        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser" class="Marlinc\AdminBundle\Guesser\EnumTypeGuesser" decorates="sonata.admin.guesser.orm_list">
+        <argument type="service" id=".inner"/>
+        <argument>%doctrine.dbal.connection_factory.types%</argument>
         </service>
         <service id="sonata.admin.builder.orm_list" class="Sonata\DoctrineORMAdminBundle\Builder\ListBuilder">
             <argument type="service" id="sonata.admin.guesser.orm_list_chain"/><argument/>
