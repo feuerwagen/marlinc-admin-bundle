@@ -5,7 +5,7 @@ namespace Marlinc\AdminBundle\Route;
 use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\RouteBuilderInterface;
-use Sonata\AdminBundle\Route\RouteCollection;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 
 class EntityRouterBuilder  implements RouteBuilderInterface
 {
@@ -23,15 +23,16 @@ class EntityRouterBuilder  implements RouteBuilderInterface
      */
     public function __construct(PathInfoBuilder $decorated,AuditManagerInterface $manager)
     {
+        dd($decorated);
         $this->decorated = $decorated;
 
         $this->manager = $manager;
     }
     /**
      * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
-     * @param \Sonata\AdminBundle\Route\RouteCollection $collection
+     * @param \Sonata\AdminBundle\Route\RouteCollectionInterface $collection
      */
-    public function build(AdminInterface $admin, RouteCollection $collection)
+    public function build(AdminInterface $admin, RouteCollectionInterface $collection): void
     {
         $this->decorated->build($admin, $collection);
 
