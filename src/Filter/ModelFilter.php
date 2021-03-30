@@ -8,17 +8,15 @@
 
 namespace Marlinc\AdminBundle\Filter;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
-use Sonata\AdminBundle\Form\Type\Filter\DefaultType;
 use Sonata\DoctrineORMAdminBundle\Filter\Filter;
 
 final class ModelFilter extends Filter
 {
+
     const TYPE_CONTAINS = 1;
     const TYPE_NOT_CONTAINS = 2;
     const TYPE_EQUAL = 3;
@@ -35,23 +33,6 @@ final class ModelFilter extends Filter
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
-    }
-
-    public function filter(\Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQueryInterface $query, string $alias, string $field, array $data): void
-    {
-        if (!\array_key_exists('value', $data) || empty($data['value'])) {
-            return;
-        }
-
-        if ($data['value'] instanceof Collection) {
-            $data['value'] = $data['value']->toArray();
-        }
-
-        if (!\is_array($data['value'])) {
-            $data['value'] = [$data['value']];
-        }
-
-        $this->handleMultiple($query, $alias, $data);
     }
 
     /**
@@ -135,7 +116,10 @@ final class ModelFilter extends Filter
         return $alias;
     }
 
-    public function getDefaultOptions() :array
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOptions()
     {
         return array(
             'mapping_type' => false,
@@ -154,58 +138,5 @@ final class ModelFilter extends Filter
                 'choice_translation_domain' => 'SonataAdminBundle',
             ],
         );
-    }
-
-    public function getRenderSettings(): array
-    {
-        return [DefaultType::class, [
-            'field_type' => $this->getFieldType(),
-            'field_options' => $this->getFieldOptions(),
-            'operator_type' => $this->getOption('operator_type'),
-            'operator_options' => $this->getOption('operator_options'),
-            'label' => $this->getLabel(),
-        ]];
-    }
-
-    protected function association(\Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQueryInterface $query, array $data): array
-    {
-        $types = [
-            ClassMetadata::ONE_TO_ONE,
-            ClassMetadata::ONE_TO_MANY,
-            ClassMetadata::MANY_TO_MANY,
-            ClassMetadata::MANY_TO_ONE,
-        ];
-
-        if (!\in_array($this->getOption('mapping_type'), $types, true)) {
-            throw new \RuntimeException('Invalid mapping type');
-        }
-
-        $associationMappings = $this->getParentAssociationMappings();
-        $associationMappings[] = $this->getAssociationMapping();
-        $alias = $query->entityJoin($associationMappings);
-
-        return [$alias, ''];
-    }
-
-    /**
-     * Retrieve the parent alias for given alias.
-     * Root alias for direct association or entity joined alias for association depth >= 2.
-     */
-    private function getParentAlias(ProxyQueryInterface $query, string $alias): string
-    {
-        $parentAlias = $rootAlias = current($query->getQueryBuilder()->getRootAliases());
-        $joins = $query->getQueryBuilder()->getDQLPart('join');
-        if (isset($joins[$rootAlias])) {
-            foreach ($joins[$rootAlias] as $join) {
-                if ($join->getAlias() === $alias) {
-                    $parts = explode('.', $join->getJoin());
-                    $parentAlias = $parts[0];
-
-                    break;
-                }
-            }
-        }
-
-        return $parentAlias;
     }
 }
