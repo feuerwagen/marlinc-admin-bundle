@@ -23,7 +23,6 @@ class EntityRouterBuilder  implements RouteBuilderInterface
      */
     public function __construct(PathInfoBuilder $decorated,AuditManagerInterface $manager)
     {
-        dd($decorated);
         $this->decorated = $decorated;
 
         $this->manager = $manager;
