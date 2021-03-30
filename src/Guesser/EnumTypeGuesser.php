@@ -10,18 +10,13 @@ namespace Marlinc\AdminBundle\Guesser;
 
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 use Fresh\DoctrineEnumBundle\Exception\EnumTypeIsRegisteredButClassDoesNotExistException;
-use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
-use Sonata\AdminBundle\FieldDescription\TypeGuesserInterface;
 use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Sonata\DoctrineORMAdminBundle\Guesser\AbstractTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Sonata\DoctrineORMAdminBundle\FieldDescription\TypeGuesser;
 
-class EnumTypeGuesser implements TypeGuesserInterface
+class EnumTypeGuesser extends AbstractTypeGuesser
 {
-    private $decorated;
-
     /**
      * @var AbstractEnumType[] Array of registered ENUM types
      */
@@ -32,10 +27,8 @@ class EnumTypeGuesser implements TypeGuesserInterface
      *
      * @param array $registeredTypes Array of registered ENUM types
      */
-    public function __construct(TypeGuesser $decorated,array $registeredTypes)
+    public function __construct(array $registeredTypes)
     {
-        $this->decorated = $decorated;
-
         foreach ($registeredTypes as $type => $details) {
             $this->registeredEnumTypes[$type] = $details['class'];
         }
@@ -44,7 +37,6 @@ class EnumTypeGuesser implements TypeGuesserInterface
     /**
      * @inheritDoc
      */
-
     public function guessType(string $class, string $property, ModelManagerInterface $modelManager): ?TypeGuess
     {
         if (!$ret = $this->getParentMetadataForProperty($class, $property, $modelManager)) {
@@ -78,10 +70,5 @@ class EnumTypeGuesser implements TypeGuesserInterface
         return new TypeGuess('choice', [
             'choices' => $registeredEnumTypeFQCN::getReadableValues()
         ], Guess::VERY_HIGH_CONFIDENCE);
-    }
-
-    public function guess(FieldDescriptionInterface $fieldDescription): TypeGuess
-    {
-        return $this->decorated->guess($fieldDescription);
     }
 }

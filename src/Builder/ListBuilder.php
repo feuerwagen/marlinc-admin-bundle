@@ -3,10 +3,11 @@
 namespace Marlinc\AdminBundle\Builder;
 
 use Sonata\AdminBundle\Builder\ListBuilderInterface;
-use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
-use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
-use Sonata\AdminBundle\FieldDescription\TypeGuesserInterface;
+use Sonata\AdminBundle\Guesser\TypeGuesserInterface;
 use Sonata\DoctrineORMAdminBundle\Builder\ListBuilder as SonataListBuilder;
+use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
+use Sonata\AdminBundle\Admin\FieldDescriptionInterface;
+use Sonata\AdminBundle\Admin\AdminInterface;
 
 final class ListBuilder implements ListBuilderInterface
 {
@@ -23,12 +24,12 @@ final class ListBuilder implements ListBuilderInterface
         $this->decorated = $decorated;
     }
 
-    public function getBaseList(array $options = []): FieldDescriptionCollection
+    public function getBaseList(array $options = []):FieldDescriptionCollection
     {
-        return new FieldDescriptionCollection();
+        return $this->decorated->getBaseList($options);
     }
 
-    public function buildField(?string $type, FieldDescriptionInterface $fieldDescription): void
+    public function buildField(?string $type,FieldDescriptionInterface $fieldDescription, AdminInterface $admin): void
     {
         if (null == $type) {
             $guessType = $guessType = $this->guesser->guess($fieldDescription);
@@ -41,12 +42,17 @@ final class ListBuilder implements ListBuilderInterface
         $this->fixFieldDescription($admin, $fieldDescription);
     }
 
-    public function addField(FieldDescriptionCollection $list, ?string $type, FieldDescriptionInterface $fieldDescription): void {
-        $this->decorated->addField($list,$type,$fieldDescription);
+    public function addField(
+        FieldDescriptionCollection $list,
+        ?string $type,
+        FieldDescriptionInterface $fieldDescription,
+        AdminInterface $admin
+    ): void {
+        $this->decorated->addField($list,$type,$fieldDescription,$admin);
     }
 
-    public function fixFieldDescription(FieldDescriptionInterface $fieldDescription): void
+    public function fixFieldDescription(AdminInterface $admin, FieldDescriptionInterface $fieldDescription): void
     {
-        $this->decorated->fixFieldDescription($fieldDescription);
+        $this->decorated->fixFieldDescription( $admin , $fieldDescription);
     }
 }
