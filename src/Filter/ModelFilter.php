@@ -8,18 +8,21 @@
 
 namespace Marlinc\AdminBundle\Filter;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
+use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter as BaseFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\Filter;
 
-final class ModelFilter extends Filter
+class ModelFilter extends Filter
 {
-
     const TYPE_CONTAINS = 1;
     const TYPE_NOT_CONTAINS = 2;
     const TYPE_EQUAL = 3;
+
+    private $decorated;
 
     /**
      * @var EntityManager
@@ -30,9 +33,20 @@ final class ModelFilter extends Filter
      * ModelFilter constructor.
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em)
+    public function __construct(BaseFilter $decorated,EntityManager $em)
     {
         $this->em = $em;
+        $this->decorated = $decorated;
+    }
+
+    public function filter(ProxyQueryInterface $query, string $alias, string $field, array $data): void
+    {
+        $this->decorated->filter($query,$alias,$field,$data);
+    }
+
+    public function getRenderSettings(): array
+    {
+        return $this->decorated->getRenderSettings();
     }
 
     /**
@@ -119,7 +133,7 @@ final class ModelFilter extends Filter
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function getDefaultOptions():array
     {
         return array(
             'mapping_type' => false,
