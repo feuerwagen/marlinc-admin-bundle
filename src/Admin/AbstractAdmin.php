@@ -152,7 +152,7 @@ abstract class AbstractAdmin extends BaseAdmin
         }
     }
 
-    protected function buildList()
+    protected function buildList():void
     {
         if ($this->list) {
             return;
@@ -218,7 +218,7 @@ abstract class AbstractAdmin extends BaseAdmin
         ;
     }
 
-    protected function configureListFields(ListMapper $list)
+    protected function configureListFields(ListMapper $list):void
     {
         $list
             ->add('_action', null, [
