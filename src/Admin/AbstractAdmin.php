@@ -83,51 +83,6 @@ abstract class AbstractAdmin extends BaseAdmin
         return parent::getTemplate($name);
     }
 
-    public function getBatchActions()
-    {
-        if ($this->datagridMode == 'list') {
-            return parent::getBatchActions();
-        }
-
-        // Override batch actions while in trash mode.
-        $actions = [];
-
-        if ($this->hasRoute('realdelete') && $this->hasAccess('delete')) {
-            $actions['realdelete'] = [
-                'label' => 'action_real_delete',
-                'translation_domain' => 'MarlincAdminBundle',
-                'ask_confirmation' => true, // by default always true
-            ];
-        }
-
-        if ($this->hasRoute('untrash') && $this->hasAccess('edit')) {
-            $actions['untrash'] = [
-                'label' => 'action_restore',
-                'translation_domain' => 'PicossSonataExtraAdminBundle',
-                'ask_confirmation' => true, // by default always true
-            ];
-        }
-
-        foreach ($actions  as $name => &$action) {
-            if (!array_key_exists('label', $action)) {
-                $action['label'] = $this->getTranslationLabel($name, 'batch', 'label');
-            }
-
-            if (!array_key_exists('translation_domain', $action)) {
-                $action['translation_domain'] = $this->getTranslationDomain();
-            }
-        }
-
-        return $actions;
-    }
-
-    public function getList()
-    {
-        $this->buildList();
-
-        return $this->list;
-    }
-
     public function getDatagridMode()
     {
         return $this->datagridMode;
