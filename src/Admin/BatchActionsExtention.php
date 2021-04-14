@@ -8,7 +8,9 @@ class BatchActionsExtention extends AbstractAdminExtension
 {
     public function configureBatchActions(AdminInterface $admin, array $actions): array
     {
-        $actions=$admin->getBatchActions();
+        if ($admin->datagridMode == 'list') {
+            return $admin->getBatchActions();
+        }
 
         if ($admin->hasRoute('realdelete') && $admin->hasAccess('delete')) {
             $actions['realdelete'] = [
@@ -21,7 +23,7 @@ class BatchActionsExtention extends AbstractAdminExtension
         if ($admin->hasRoute('untrash') && $admin->hasAccess('edit')) {
             $actions['untrash'] = [
                 'label' => 'action_restore',
-                'translation_domain' => 'PicossSonataExtraAdminBundle',
+                'translation_domain' => 'MarlincAdminBundle',
                 'ask_confirmation' => true, // by default always true
             ];
         }
