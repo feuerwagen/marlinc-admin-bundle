@@ -8,7 +8,7 @@ class BatchActionsExtention extends AbstractAdminExtension
 {
     public function configureBatchActions(AdminInterface $admin, array $actions): array
     {
-        if ($admin->datagridMode == 'list') {
+        if ($admin->getListMode() == 'list') {
             return $admin->getBatchActions();
         }
 
