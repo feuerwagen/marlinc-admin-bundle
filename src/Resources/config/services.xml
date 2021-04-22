@@ -20,7 +20,7 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
         </service>
-        <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension">
+        <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension" public="true">
             <tag name="sonata.admin.extension" global="true" />
             <argument type="service" id="security.token_storage"/>
             <argument type="service" id="security.authorization_checker"/>
@@ -50,7 +50,7 @@
         <service id="Marlinc\AdminBundle\Form\DependencyExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
-        <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" >
+        <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" public="true">
             <tag name="sonata.admin.extension" global="true" />
         </service>
     </services>
