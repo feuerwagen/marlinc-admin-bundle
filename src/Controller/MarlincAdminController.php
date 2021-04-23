@@ -12,7 +12,7 @@ namespace Marlinc\AdminBundle\Controller;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
-use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
+use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -24,7 +24,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class MarlincAdminController extends ExtraAdminController
+class MarlincAdminController extends CRUDController
 {
     /**
      * Export data to specified format.
@@ -188,7 +188,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'ok']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -196,7 +196,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'error']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'MarlincAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));

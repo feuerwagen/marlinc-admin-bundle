@@ -4,9 +4,9 @@
         <td class="sonata-ba-list-field sonata-ba-list-field-{{ field_description.type }}">
             <div class="btn-group">
                 {% if admin.isGranted('EDIT', object) and admin.hasRoute('untrash') -%}
-                    <a href="{{ admin.generateObjectUrl('untrash', object) }}" class="btn edit_link btn-sm btn-default" title="{{ 'action_restore'|trans({}, 'PicossSonataExtraAdminBundle') }}">
+                    <a href="{{ admin.generateObjectUrl('untrash', object) }}" class="btn edit_link btn-sm btn-default" title="{{ 'action_restore'|trans({}, 'MarlincAdminBundle') }}">
                         <i class="fa fa-reply"></i>
-                        {{ 'action_restore'|trans({}, 'PicossSonataExtraAdminBundle') }}
+                        {{ 'action_restore'|trans({}, 'MarlincAdminBundle') }}
                     </a>
                 {%- endif %}
                 {% if admin.isGranted('DELETE', object) and admin.hasRoute('delete') -%}

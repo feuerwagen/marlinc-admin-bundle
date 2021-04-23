@@ -63,15 +63,6 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
             ]);
         }
 
-        if ($container->hasExtension('picoss_sonata_extra_admin')) {
-            // override templates
-            $container->prependExtensionConfig('picoss_sonata_extra_admin', [
-                'templates' => [
-                    'inner_trash_list_row' => '@MarlincAdmin/list/list_trash_inner_row.html.twig',
-                    'trash' => '@MarlincAdmin/list/trash.html.twig',
-                ]
-            ]);
-        }
     }
 
     public function load(array $configs, ContainerBuilder $container)
