@@ -9,7 +9,7 @@
 namespace Marlinc\AdminBundle\Guesser;
 
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
-use Fresh\DoctrineEnumBundle\Exception\EnumTypeIsRegisteredButClassDoesNotExistException;
+use Fresh\DoctrineEnumBundle\Exception\EnumType\EnumTypeIsRegisteredButClassDoesNotExistException;
 use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Sonata\DoctrineORMAdminBundle\Guesser\AbstractTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
