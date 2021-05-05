@@ -6,12 +6,13 @@ use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\RouteBuilderInterface;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
+use Sonata\AdminBundle\Route\PathInfoBuilder;
+use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
 
 class EntityRouterBuilder  implements RouteBuilderInterface
 {
     private $decorated;
     private $manager;
-
     /**
      * @var TrashManagerInterface
      */
@@ -21,10 +22,10 @@ class EntityRouterBuilder  implements RouteBuilderInterface
      * @param \Sonata\AdminBundle\Model\AuditManagerInterface $manager
      * @param TrashManagerInterface $trashManager
      */
-    public function __construct(PathInfoBuilder $decorated,AuditManagerInterface $manager)
+    public function __construct(PathInfoBuilder $decorated,AuditManagerInterface $manager, TrashManager $trashManager)
     {
         $this->decorated = $decorated;
-
+        $this->trashManager = $trashManager;
         $this->manager = $manager;
     }
     /**
@@ -37,6 +38,13 @@ class EntityRouterBuilder  implements RouteBuilderInterface
 
         if ($this->manager->hasReader($admin->getClass())) {
             $collection->add('history_revert', $admin->getRouterIdParameter() . '/history/{revision}/revert');
+        }
+
+        if ($this->trashManager->hasReader($admin->getClass())) {
+            $collection->add('batch_trash', 'trash/batch');
+            $collection->add('trash', 'trash');
+            $collection->add('untrash', $admin->getRouterIdParameter() . '/untrash');
+            $collection->add('realdelete', $admin->getRouterIdParameter() . '/realdelete');
         }
 
     }

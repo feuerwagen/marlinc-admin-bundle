@@ -31,10 +31,10 @@
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
         </service>
-        <service id="Sonata\AdminBundle\Route\PathInfoBuilder" />
-        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder"  decorates="Sonata\AdminBundle\Route\PathInfoBuilder">
+        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder"  decorates="sonata.admin.route.path_info">
             <argument type="service" id=".inner"/>
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="sonata.admin.audit.manager" />
+            <argument type="service" id="picoss.sonataextraadmin.trash.manager"/>
         </service>
         <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
             <argument>%doctrine.dbal.connection_factory.types%</argument>
