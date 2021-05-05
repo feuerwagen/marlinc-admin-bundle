@@ -8,11 +8,10 @@
 
 namespace Marlinc\AdminBundle\Controller;
 
-
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
-use Sonata\AdminBundle\Controller\CRUDController;
+use Marlinc\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -24,7 +23,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class MarlincAdminController extends CRUDController
+class MarlincAdminController extends ExtraAdminController
 {
     /**
      * Export data to specified format.
@@ -54,7 +53,7 @@ class MarlincAdminController extends CRUDController
         $datagrid->buildPager();
 
         $query = $datagrid->getQuery();
-        $query->select('DISTINCT '.$query->getRootAlias());
+        $query->select('DISTINCT ' . $query->getRootAlias());
 
         // Reset page size restrictions
         $query->setFirstResult(null);
@@ -148,9 +147,9 @@ class MarlincAdminController extends CRUDController
         $exporter = $this->get('marlinc.admin.exporter');
 
         return $this->renderWithExtraParams($this->admin->getTemplate('trash'), [
-            'action'     => 'trash',
-            'form'       => $formView,
-            'datagrid'   => $datagrid,
+            'action' => 'trash',
+            'form' => $formView,
+            'datagrid' => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $exporter->getAvailableFormats($this->admin),
         ]);
@@ -188,7 +187,7 @@ class MarlincAdminController extends CRUDController
                     return $this->renderJson(['result' => 'ok']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'MarlincAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'PicossSonataExtraAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -196,15 +195,15 @@ class MarlincAdminController extends CRUDController
                     return $this->renderJson(['result' => 'error']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'MarlincAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'PicossSonataExtraAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));
         }
 
         return $this->renderWithExtraParams($this->admin->getTemplate('untrash'), [
-            'object'     => $object,
-            'action'     => 'untrash',
+            'object' => $object,
+            'action' => 'untrash',
             'csrf_token' => $this->getCsrfToken('sonata.untrash')
         ]);
     }
@@ -214,11 +213,11 @@ class MarlincAdminController extends CRUDController
      *
      * @param int|string|null $id
      *
-     * @throws NotFoundHttpException If the object does not exist
+     * @return Response|RedirectResponse
      * @throws AccessDeniedException If access is not granted
      * @throws \Exception
      *
-     * @return Response|RedirectResponse
+     * @throws NotFoundHttpException If the object does not exist
      */
     public function realdeleteAction($id)
     {
@@ -354,7 +353,7 @@ class MarlincAdminController extends CRUDController
         $em->getFilters()->enable('softdeleteabletrash');
 
         try {
-            $query->select('DISTINCT '.current($query->getRootAliases()));
+            $query->select('DISTINCT ' . current($query->getRootAliases()));
 
             try {
                 $i = 0;
@@ -422,7 +421,7 @@ class MarlincAdminController extends CRUDController
         if ($parentAdmin->getObject($parentId) !== $propertyAccessor->getValue($object, $propertyPath)) {
             // NEXT_MAJOR: make this exception
             @trigger_error("Accessing a child that isn't connected to a given parent is deprecated since 3.34"
-                ." and won't be allowed in 4.0.",
+                . " and won't be allowed in 4.0.",
                 E_USER_DEPRECATED
             );
         }
