@@ -11,7 +11,7 @@
 
 namespace Marlinc\AdminBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
+use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
