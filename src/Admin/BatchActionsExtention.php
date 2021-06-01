@@ -8,9 +8,6 @@ class BatchActionsExtention extends AbstractAdminExtension
 {
     public function configureBatchActions(AdminInterface $admin, array $actions): array
     {
-        if ($admin->getListMode() == 'list') {
-            return $admin->getBatchActions();
-        }
 
         if ($admin->hasRoute('realdelete') && $admin->hasAccess('delete')) {
             $actions['realdelete'] = [
