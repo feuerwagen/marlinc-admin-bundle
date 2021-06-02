@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
 
 class MarlincAdminController extends ExtraAdminController
 {
@@ -35,7 +36,7 @@ class MarlincAdminController extends ExtraAdminController
      * @throws AccessDeniedException If access is not granted
      * @throws \RuntimeException     If the export format is invalid
      */
-    public function exportAction(Request $request)
+    public function exportAction(Request $request): Response
     {
         $this->admin->checkAccess('export');
         $adminExporter = $this->get('marlinc.admin.exporter');
@@ -81,7 +82,7 @@ class MarlincAdminController extends ExtraAdminController
      * @throws AccessDeniedException If access is not granted
      * @throws \Twig_Error_Runtime
      */
-    public function listAction()
+    public function listAction(Request $request): Response
     {
         $request = $this->getRequest();
 
@@ -160,7 +161,7 @@ class MarlincAdminController extends ExtraAdminController
      * @param $id
      * @return Response
      */
-    public function untrashAction(Request $request, $id)
+    public function untrashAction(Request $request, $id,TrashManager $trashManager)
     {
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine()->getManager();
