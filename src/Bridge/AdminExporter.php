@@ -78,7 +78,7 @@ final class AdminExporter
         $class = $admin->getClass();
 
         if (array_key_exists($class, $this->formats)) {
-            return $this->formats[$class];
+            return array_keys($this->writers);
         }
 
         return [];
