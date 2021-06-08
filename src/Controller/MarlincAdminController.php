@@ -106,7 +106,7 @@ class MarlincAdminController extends ExtraAdminController
         // Get exporter service.
         $exporter = $this->get('marlinc.admin.exporter');
 
-        return $this->renderWithExtraParams($this->admin->getTemplate('list'), [
+        return $this->renderWithExtraParams($this->admin->getTemplateRegistry()->getTemplate('list'), [
             'action' => 'list',
             'form' => $formView,
             'datagrid' => $datagrid,
