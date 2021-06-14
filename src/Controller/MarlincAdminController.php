@@ -62,7 +62,11 @@ class MarlincAdminController extends ExtraAdminController
         $query->setMaxResults(null);
 
         if ($query instanceof ProxyQueryInterface) {
-        //    $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
+
+            if($query->getSortBy() !== NULL ) {
+                $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
+            }
+
             $query = $query->getQuery();
         }
 
