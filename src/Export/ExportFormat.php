@@ -21,9 +21,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class ExportFormat implements ExportFormatInterface
 {
     /**
-     * @var array
+     * @var string
      */
-    protected $filetypes = ['xlsx'];
+    protected $filetypes = 'xlsx';
 
     /**
      * @var ExportColumn[]
@@ -173,4 +173,15 @@ class ExportFormat implements ExportFormatInterface
     public function getSourceIterator(Query $query) {
         return new ComplexStructureSourceIterator($query, $this);
     }
+
+    public function getFileType()
+    {
+        return  $this->filetypes;
+    }
+
+    public function setFileType(string $fileType)
+    {
+        return  $this->filetypes=$fileType;
+    }
+
 }

@@ -42,11 +42,12 @@ class MarlincAdminController extends ExtraAdminController
         $adminExporter = $this->get('marlinc.admin.exporter');
 
         // Get service export name and file format from request
-        $filetype = $request->get('filetype');
         $format = $request->get('format');
 
         // Get the real format and filename to use.
         $exportFormat = $adminExporter->getExportFormat($this->admin, $format);
+        $filetype = $exportFormat->getFileType();
+
         $filename = $adminExporter->getExportFilename($this->admin, $exportFormat, $filetype);
 
         // Build query.
@@ -61,7 +62,7 @@ class MarlincAdminController extends ExtraAdminController
         $query->setMaxResults(null);
 
         if ($query instanceof ProxyQueryInterface) {
-            $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
+        //    $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
             $query = $query->getQuery();
         }
 
