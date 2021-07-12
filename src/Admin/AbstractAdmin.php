@@ -153,59 +153,6 @@ abstract class AbstractAdmin extends BaseAdmin
         }
     }
 
-    protected function buildList():void
-    {
-        if ($this->list) {
-            return;
-        }
-
-        $this->list = $this->getListBuilder()->getBaseList();
-
-        $mapper = new ListMapper($this->getListBuilder(), $this->list, $this);
-
-        if (count($this->getBatchActions()) > 0) {
-            $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
-                $this->getClass(),
-                'batch',
-                [
-                    'label' => 'batch',
-                    'code' => '_batch',
-                    'sortable' => false,
-                    'virtual_field' => true,
-                ]
-            );
-
-            $fieldDescription->setAdmin($this);
-            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('batch'));
-
-            $mapper->add($fieldDescription, 'batch');
-        }
-
-        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
-            $this->configureTrashFields($mapper);
-        } else {
-            $this->configureListFields($mapper);
-        }
-
-        if ($this->hasRequest() && $this->getRequest()->isXmlHttpRequest()) {
-            $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
-                $this->getClass(),
-                'select',
-                [
-                    'label' => false,
-                    'code' => '_select',
-                    'sortable' => false,
-                    'virtual_field' => false,
-                ]
-            );
-
-            $fieldDescription->setAdmin($this);
-            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('select'));
-
-            $mapper->add($fieldDescription, 'select');
-        }
-    }
-
     protected function configureTrashFields(ListMapper $mapper)
     {
         $mapper
