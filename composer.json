@@ -28,6 +28,7 @@
     "symfony/dependency-injection": "^5.2",
     "symfony/form": "^5.2",
     "symfony/http-kernel": "^5.2",
+    "symfony/intl": "^5.2",
     "liip/imagine-bundle": "^2.5"
   },
   "require-dev": {
