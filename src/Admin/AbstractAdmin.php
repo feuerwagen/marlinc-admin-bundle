@@ -16,6 +16,8 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Countries;
 
 abstract class AbstractAdmin extends BaseAdmin
 {
@@ -60,15 +62,13 @@ abstract class AbstractAdmin extends BaseAdmin
     private $datagridMode = AbstractAdmin::MODE_LIST;
 
     protected function getFilteredLanguages() {
-        $languages = array_flip($this->getConfigurationPool()->getContainer()->getParameter('marlinc_languages'));
-
-        return array_intersect_key(Intl::getLanguageBundle()->getLanguageNames(), $languages);
+        \Locale::setDefault('en');
+        return $languages = Languages::getNames();
     }
 
     protected function getFilteredCountries() {
-        $countries = array_flip($this->getConfigurationPool()->getContainer()->getParameter('marlinc_countries'));
-
-        return array_intersect_key(Intl::getRegionBundle()->getCountryNames(), $countries);
+        \Locale::setDefault('en');
+        return Countries::getNames();;
     }
 
     /**
