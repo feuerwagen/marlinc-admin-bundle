@@ -3,56 +3,55 @@
 namespace Marlinc\AdminBundle\Builder;
 
 use Sonata\AdminBundle\Builder\ListBuilderInterface;
-use Sonata\AdminBundle\Guesser\TypeGuesserInterface;
+use Sonata\AdminBundle\FieldDescription\TypeGuesserInterface;
+use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
+use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\DoctrineORMAdminBundle\Builder\ListBuilder as SonataListBuilder;
-use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
-use Sonata\AdminBundle\Admin\FieldDescriptionInterface;
-use Sonata\AdminBundle\Admin\AdminInterface;
 
 final class ListBuilder implements ListBuilderInterface
 {
-    private $decorated;
+    private SonataListBuilder $decorated;
 
-    /**
-     * @var TypeGuesserInterface
-     */
-    private $guesser;
+    private TypeGuesserInterface $guesser;
 
-    public function __construct( SonataListBuilder $decorated,TypeGuesserInterface $guesser)
+    public function __construct(SonataListBuilder $decorated, TypeGuesserInterface $guesser)
     {
         $this->guesser = $guesser;
         $this->decorated = $decorated;
     }
 
-    public function getBaseList(array $options = []):FieldDescriptionCollection
+    public function getBaseList(array $options = []): FieldDescriptionCollection
     {
         return $this->decorated->getBaseList($options);
     }
 
-    public function buildField(?string $type,FieldDescriptionInterface $fieldDescription, AdminInterface $admin): void
+    public function buildField(?string $type, FieldDescriptionInterface $fieldDescription): void
     {
-        if (null == $type) {
-            $guessType = $guessType = $this->guesser->guess($fieldDescription);
-            $fieldDescription->setType($guessType->getType() ? $guessType->getType() : '_action');
+        if (null === $type) {
+            $guessType = $this->guesser->guess($fieldDescription);
+            if (null === $guessType) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Cannot guess a type for the field description "%s", You MUST provide a type.',
+                    $fieldDescription->getName()
+                ));
+            }
+
+            $fieldDescription->setType($guessType->getType());
             $fieldDescription->setOptions(array_merge($guessType->getOptions(), $fieldDescription->getOptions()));
         } else {
             $fieldDescription->setType($type);
         }
 
-        $this->fixFieldDescription($admin, $fieldDescription);
+        $this->fixFieldDescription($fieldDescription);
     }
 
-    public function addField(
-        FieldDescriptionCollection $list,
-        ?string $type,
-        FieldDescriptionInterface $fieldDescription,
-        AdminInterface $admin
-    ): void {
-        $this->decorated->addField($list,$type,$fieldDescription,$admin);
-    }
-
-    public function fixFieldDescription(AdminInterface $admin, FieldDescriptionInterface $fieldDescription): void
+    public function addField(FieldDescriptionCollection $list, ?string $type, FieldDescriptionInterface $fieldDescription): void
     {
-        $this->decorated->fixFieldDescription( $admin , $fieldDescription);
+        $this->decorated->addField($list, $type, $fieldDescription);
+    }
+
+    public function fixFieldDescription(FieldDescriptionInterface $fieldDescription): void
+    {
+        $this->decorated->fixFieldDescription($fieldDescription);
     }
 }
