@@ -31,8 +31,8 @@
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
         </service>
-        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder"  decorates="sonata.admin.route.path_info">
-            <argument type="service" id=".inner"/>
+        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder">
+            <argument type="service" id="sonata.admin.route.path_info"/>
             <argument type="service" id="sonata.admin.audit.manager" />
             <argument type="service" id="picoss.sonataextraadmin.trash.manager"/>
         </service>

@@ -2,41 +2,33 @@
 
 namespace Marlinc\AdminBundle\Route;
 
+use Marlinc\SonataExtraAdminBundle\Model\TrashManagerInterface;
 use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\RouteBuilderInterface;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Route\PathInfoBuilder;
-use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
 
 class EntityRouterBuilder  implements RouteBuilderInterface
 {
-    private $decorated;
-    private $manager;
-    /**
-     * @var TrashManagerInterface
-     */
-    protected $trashManager;
+    private PathInfoBuilder $decorated;
 
-    /**
-     * @param \Sonata\AdminBundle\Model\AuditManagerInterface $manager
-     * @param TrashManagerInterface $trashManager
-     */
-    public function __construct(PathInfoBuilder $decorated,AuditManagerInterface $manager, TrashManager $trashManager)
+    private AuditManagerInterface $auditManager;
+
+    private TrashManagerInterface $trashManager;
+
+    public function __construct(PathInfoBuilder $decorated, AuditManagerInterface $auditManager, TrashManagerInterface $trashManager)
     {
         $this->decorated = $decorated;
         $this->trashManager = $trashManager;
-        $this->manager = $manager;
+        $this->auditManager = $auditManager;
     }
-    /**
-     * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
-     * @param \Sonata\AdminBundle\Route\RouteCollectionInterface $collection
-     */
+
     public function build(AdminInterface $admin, RouteCollectionInterface $collection): void
     {
         $this->decorated->build($admin, $collection);
 
-        if ($this->manager->hasReader($admin->getClass())) {
+        if ($this->auditManager->hasReader($admin->getClass())) {
             $collection->add('history_revert', $admin->getRouterIdParameter() . '/history/{revision}/revert');
         }
 
