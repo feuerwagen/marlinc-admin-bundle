@@ -11,6 +11,7 @@ namespace Marlinc\AdminBundle\Controller;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
+use Marlinc\AdminBundle\Bridge\AdminExporter;
 use Marlinc\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
@@ -26,15 +27,15 @@ use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
 
 class MarlincAdminController extends ExtraAdminController
 {
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'marlinc.admin.exporter' => AdminExporter::class,
+        ] + parent::getSubscribedServices();
+    }
+
     /**
-     * Export data to specified format.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     *
-     * @throws AccessDeniedException If access is not granted
-     * @throws \RuntimeException     If the export format is invalid
+     * @inheritdoc
      */
     public function exportAction(Request $request): Response
     {
@@ -82,10 +83,7 @@ class MarlincAdminController extends ExtraAdminController
      * List action.
      * Overridden to adapt to the needs of the improved export format.
      *
-     * @return Response
-     *
-     * @throws AccessDeniedException If access is not granted
-     * @throws \Twig_Error_Runtime
+     * @inheritdoc
      */
     public function listAction(Request $request): Response
     {

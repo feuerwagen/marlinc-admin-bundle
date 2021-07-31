@@ -18,11 +18,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 final class AdminExporter
 {
     /**
-     * @var Exporter service from the exporter bundle
-     */
-    private $exporter;
-
-    /**
      * @var ExportFormat[]
      */
     private $formats;
@@ -32,13 +27,8 @@ final class AdminExporter
      */
     private $writers;
 
-    /**
-     * @param Exporter $exporter will be used to get global settings
-     * @param array $writers
-     */
-    public function __construct(Exporter $exporter, array $writers = [])
+    public function __construct(array $writers = [])
     {
-        $this->exporter = $exporter;
         $this->formats = [];
         $this->writers = [];
 

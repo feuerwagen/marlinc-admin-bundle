@@ -10,8 +10,7 @@
             <argument type="service" id="phpspreadsheet"/>
             <argument>%writer.xlsx.filename%</argument>
         </service>
-        <service id="marlinc.admin.exporter" class="Marlinc\AdminBundle\Bridge\AdminExporter" public="true">
-            <argument type="service" id="sonata.exporter.exporter"/>
+        <service id="marlinc.admin.exporter" class="Marlinc\AdminBundle\Bridge\AdminExporter">
         </service>
         <service id="phpspreadsheet" class="%phpspreadsheet.class%" />
         <service id="Sonata\DoctrineORMAdminBundle\Filter\ModelFilter" />
@@ -20,7 +19,7 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
         </service>
-        <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension" public="true">
+        <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension">
             <tag name="sonata.admin.extension" global="true" />
             <argument type="service" id="security.token_storage"/>
             <argument type="service" id="security.authorization_checker"/>
