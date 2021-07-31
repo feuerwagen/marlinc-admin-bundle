@@ -30,7 +30,7 @@ class MarlincAdminController extends ExtraAdminController
     public static function getSubscribedServices(): array
     {
         return [
-            'marlinc.admin.exporter' => AdminExporter::class,
+            AdminExporter::class,
         ] + parent::getSubscribedServices();
     }
 
