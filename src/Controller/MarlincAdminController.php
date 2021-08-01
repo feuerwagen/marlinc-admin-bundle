@@ -40,7 +40,7 @@ class MarlincAdminController extends ExtraAdminController
     public function exportAction(Request $request): Response
     {
         $this->admin->checkAccess('export');
-        $adminExporter = $this->get('marlinc.admin.exporter');
+        $adminExporter = $this->get(AdminExporter::class);
 
         // Get service export name and file format from request
         $format = $request->get('format');
@@ -63,8 +63,7 @@ class MarlincAdminController extends ExtraAdminController
         $query->setMaxResults(null);
 
         if ($query instanceof ProxyQueryInterface) {
-
-            if($query->getSortBy() !== NULL ) {
+            if ($query->getSortBy() !== NULL) {
                 $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
             }
 
@@ -80,51 +79,11 @@ class MarlincAdminController extends ExtraAdminController
     }
 
     /**
-     * List action.
-     * Overridden to adapt to the needs of the improved export format.
-     *
-     * @inheritdoc
-     */
-    public function listAction(Request $request): Response
-    {
-        $request = $this->getRequest();
-
-        $this->admin->checkAccess('list');
-
-        $preResponse = $this->preList($request);
-        if ($preResponse !== null) {
-            return $preResponse;
-        }
-
-        if ($listMode = $request->get('_list_mode')) {
-            $this->admin->setListMode($listMode);
-        }
-
-        $datagrid = $this->admin->getDatagrid();
-        $formView = $datagrid->getForm()->createView();
-
-        // Set the theme for the current Admin form.
-        $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
-
-        // Get exporter service.
-        $exporter = $this->get('marlinc.admin.exporter');
-
-        return $this->renderWithExtraParams($this->admin->getTemplateRegistry()->getTemplate('list'), [
-            'action' => 'list',
-            'form' => $formView,
-            'datagrid' => $datagrid,
-            'csrf_token' => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $exporter->getAvailableFormats($this->admin),
-        ]);
-    }
-
-    /**
      * Return the Response object associated to the trash action.
      * Overridden to fix the invocation of the softdeleteable trash filter.
      *
      * @return Response
-     * @throws AccessDeniedException
-     * @throws \Twig_Error_Runtime
+     * @throws AccessDeniedException|\Twig\Error\RuntimeError
      */
     public function trashAction()
     {
@@ -148,7 +107,7 @@ class MarlincAdminController extends ExtraAdminController
         $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
         // Get exporter service.
-        $exporter = $this->get('marlinc.admin.exporter');
+        $exporter = $this->get(AdminExporter::class);
 
         return $this->renderWithExtraParams($this->admin->getTemplate('trash'), [
             'action' => 'trash',

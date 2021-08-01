@@ -9,6 +9,7 @@
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
 
+use Marlinc\AdminBundle\Bridge\AdminExporter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -20,11 +21,11 @@ final class AdminExporterCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('marlinc.admin.exporter')) {
+        if (!$container->has(AdminExporter::class)) {
             return;
         }
 
-        $definition = $container->findDefinition('marlinc.admin.exporter');
+        $definition = $container->findDefinition(AdminExporter::class);
         $formats = $container->findTaggedServiceIds('marlinc.exporter.format');
 
         foreach ($formats as $id => $tags) {
