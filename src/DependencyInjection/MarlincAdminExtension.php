@@ -23,7 +23,11 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
     public function prepend(ContainerBuilder $container): void
     {
         if ($container->hasExtension('sonata_admin')) {
-            // override templates
+            // Override templates & assets
+            // TODO: This is really crude and messy:
+            //  - Update the templates (figure out whats really needed)
+            //  - Only load assets that are part of the bundle and it's dependencies
+            /*
             $container->prependExtensionConfig('sonata_admin', [
                 'templates' => [
                     'layout' => '@MarlincAdmin/layout.html.twig',
@@ -51,16 +55,17 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
                         'bundles/sonatatranslation/css/sonata-translation.css'
                     ]
                 ]
-            ]);
+            ]);//*/
         }
 
         if ($container->hasExtension('sonata_doctrine_orm_admin')) {
             // add custom form widgets
-            $container->prependExtensionConfig('sonata_doctrine_orm_admin', [
+            // TODO: Check each widget if it still works as intended
+            /*$container->prependExtensionConfig('sonata_doctrine_orm_admin', [
                 'templates' => [
                     'form' => ['@MarlincAdmin/form/form_layout.html.twig']
                 ]
-            ]);
+            ]);//*/
         }
 
     }

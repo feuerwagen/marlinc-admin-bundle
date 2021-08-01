@@ -10,12 +10,11 @@ namespace Marlinc\AdminBundle\Admin;
 
 
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
-use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
+use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
 use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Countries;
 
@@ -63,13 +62,16 @@ abstract class AbstractAdmin extends BaseAdmin
 
     protected function getFilteredLanguages() {
         \Locale::setDefault('en');
-        return $languages = Languages::getNames();
+        return Languages::getNames();
     }
 
     protected function getFilteredCountries() {
         \Locale::setDefault('en');
-        return Countries::getNames();;
+        return Countries::getNames();
     }
+
+    // TODO: the following methods are intended to extend the normal list view with a variant for a trash list.
+    //  Update this to SonataAdmin 4.x, preferably by using the provided extesion points.
 
     /**
      * @inheritDoc
@@ -81,7 +83,6 @@ abstract class AbstractAdmin extends BaseAdmin
         }
 
         return $this->getTemplateRegistry()->getTemplate($name);
-
     }
 
     public function getDatagridMode()
