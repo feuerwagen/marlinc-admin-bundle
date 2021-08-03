@@ -12,7 +12,6 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
 use Marlinc\AdminBundle\Bridge\AdminExporter;
-use Marlinc\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;

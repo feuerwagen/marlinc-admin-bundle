@@ -22,7 +22,6 @@
     "giggsey/libphonenumber-for-php": "^8.12",
     "phpoffice/phpspreadsheet": "^1.17",
     "symfony/maker-bundle": "^1.29",
-    "marlinc/sonata-extra-admin-bundle": "^1.0.0-alpha",
     "sonata-project/admin-bundle": "^4.0.0-alpha",
     "sonata-project/doctrine-orm-admin-bundle": "^4.0.0-alpha",
     "symfony/dependency-injection": "^5.2",

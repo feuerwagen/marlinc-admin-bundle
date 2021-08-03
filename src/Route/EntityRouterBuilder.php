@@ -2,7 +2,7 @@
 
 namespace Marlinc\AdminBundle\Route;
 
-use Marlinc\SonataExtraAdminBundle\Model\TrashManagerInterface;
+use Marlinc\AdminBundle\Model\TrashManagerInterface;
 use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\RouteBuilderInterface;
