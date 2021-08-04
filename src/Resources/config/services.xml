@@ -35,10 +35,6 @@
             <argument type="service" id="sonata.admin.audit.manager" />
             <argument type="service" id="picoss.sonataextraadmin.trash.manager"/>
         </service>
-        <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
-            <argument>%doctrine.dbal.connection_factory.types%</argument>
-            <tag name="sonata.admin.guesser.orm_list" />
-        </service>
         <service id="Marlinc\AdminBundle\Builder\ListBuilder"  decorates="sonata.admin.builder.orm_list">
             <argument type="service" id=".inner"/>
             <argument type="service" id="sonata.admin.guesser.orm_list_chain"/><argument/>
@@ -52,5 +48,18 @@
         <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" public="true">
             <tag name="sonata.admin.extension" global="true" />
         </service>
+
+        <service id="marlinc.admin.twig.extension.stringloader" class="Twig\Extension\StringLoaderExtension">
+            <tag name="twig.extension"/>
+        </service>
+        <service id="marlinc.admin.trash.manager" class="Marlinc\AdminBundle\Model\TrashManager">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="marlinc.admin.route.entity" class="Marlinc\AdminBundle\Route\AddManagerRoutesBuilder">
+            <argument type="service" id="sonata.admin.route.path_info"/>
+            <argument type="service" id="sonata.admin.audit.manager"/>
+            <argument type="service" id="marlinc.admin.trash.manager"/>
+        </service>
+
     </services>
 </container>

@@ -8,7 +8,8 @@
 
 namespace Marlinc\AdminBundle\DependencyInjection;
 
-
+use Marlinc\AdminBundle\Controller\ExtraAdminController;
+use Marlinc\SonataExtraAdminBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -72,10 +73,63 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
 
     public function load(array $configs, ContainerBuilder $container)
     {
+
+        $configs = $this->fixTemplatesConfiguration($configs);
+
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('marlinc_admin.templates', $config['templates']);
+
         $loader = new XmlFileLoader(
             $container,
             new FileLocator(__DIR__ . '/../Resources/config')
         );
         $loader->load('services.xml');
+
+        $bundles = $container->getParameter('kernel.bundles');
+        if (isset($bundles['SonataDoctrineORMAdminBundle'])) {
+            $loader->load('ORM/sortable.xml');
+
+            if ($container->hasDefinition('stof_doctrine_extensions.listener.loggable')) {
+                $loader->load('ORM/audit.xml');
+            }
+
+            if ($container->hasDefinition('stof_doctrine_extensions.listener.softdeleteable')) {
+                $loader->load('ORM/trash.xml');
+            }
+        }
+
+        $container->registerForAutoconfiguration(ExtraAdminController::class)
+            ->addTag('controller.service_arguments');
+
+    }
+
+    protected function fixTemplatesConfiguration(array $configs)
+    {
+        $defaultConfig = array(
+            'templates' => array(
+                'types' => array(
+                    'list' => array(
+                        'image' => '@MarlincAdmin/CRUD/list_image.html.twig',
+                        'string_template' => '@MarlincAdmin/CRUD/list_string_template.html.twig',
+                        'progress_bar' => '@MarlincAdmin/CRUD/list_progress_bar.html.twig',
+                        'label' => '@MarlincAdmin/CRUD/list_label.html.twig',
+                        'badge' => '@MarlincAdmin/CRUD/list_badge.html.twig',
+                    ),
+                    'show' => array(
+                        'image' => '@MarlincAdmin/CRUD/show_image.html.twig',
+                        'string_template' => '@MarlincAdmin/CRUD/show_string_template.html.twig',
+                        'progress_bar' => '@MarlincAdmin/CRUD/show_progress_bar.html.twig',
+                        'label' => '@MarlincAdmin/CRUD/show_label.html.twig',
+                        'badge' => '@MarlincAdmin/CRUD/show_badge.html.twig',
+                    )
+                )
+            )
+        );
+
+        array_unshift($configs, $defaultConfig);
+
+        return $configs;
     }
 }
