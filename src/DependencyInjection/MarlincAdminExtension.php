@@ -9,7 +9,7 @@
 namespace Marlinc\AdminBundle\DependencyInjection;
 
 use Marlinc\AdminBundle\Controller\ExtraAdminController;
-use Marlinc\SonataExtraAdminBundle\DependencyInjection\Configuration;
+use Marlinc\AdminBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -79,7 +79,7 @@ class MarlincAdminExtension extends Extension implements PrependExtensionInterfa
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('marlinc_admin.templates', $config['templates']);
+        $container->setParameter('marlinc_admin', $config['templates']);
 
         $loader = new XmlFileLoader(
             $container,

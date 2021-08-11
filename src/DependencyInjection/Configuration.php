@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('templates')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('history')->defaultValue('@MarlincAdmin/edit/realdelete.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('realdelete')->defaultValue('@MarlincAdmin/edit/realdelete.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('history')->defaultValue('@MarlincAdmin/CRUD/history.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('history_revert')->defaultValue('@MarlincAdmin/CRUD/history_revert.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('history_revision_timestamp')->defaultValue('@MarlincAdmin/CRUD/history_revision_timestamp.html.twig')->cannotBeEmpty()->end()

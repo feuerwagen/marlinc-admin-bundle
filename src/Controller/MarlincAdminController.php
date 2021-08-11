@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
+use Marlinc\AdminBundle\Model\TrashManager;
 
 class MarlincAdminController extends ExtraAdminController
 {
