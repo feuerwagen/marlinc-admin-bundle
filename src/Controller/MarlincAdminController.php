@@ -29,8 +29,8 @@ class MarlincAdminController extends ExtraAdminController
     public static function getSubscribedServices(): array
     {
         return [
-            AdminExporter::class,
-        ] + parent::getSubscribedServices();
+                AdminExporter::class,
+            ] + parent::getSubscribedServices();
     }
 
     /**
@@ -149,7 +149,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'ok']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -157,7 +157,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'error']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'MarlincAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));

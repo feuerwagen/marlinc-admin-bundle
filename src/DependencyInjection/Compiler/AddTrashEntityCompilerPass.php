@@ -48,7 +48,7 @@ class AddTrashEntityCompilerPass implements CompilerPassInterface
 
         $trashedEntities = array_unique($trashedEntities);
 
-        $container->getDefinition('picoss.sonataextraadmin.trash.manager')->addMethodCall('setReader', array('picoss.sonata.extra.admin.trash.orm.reader', $trashedEntities));
+        $container->getDefinition('marlinc.admin.trash.manager')->addMethodCall('setReader', array('marlinc.admin.trash.manager', $trashedEntities));
     }
 
     /**

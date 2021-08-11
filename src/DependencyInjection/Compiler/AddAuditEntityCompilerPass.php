@@ -48,7 +48,7 @@ class AddAuditEntityCompilerPass implements CompilerPassInterface
 
         $auditedEntities = array_unique($auditedEntities);
 
-        $container->getDefinition('sonata.admin.audit.manager')->addMethodCall('setReader', array('picoss.sonata.extra.admin.audit.orm.reader', $auditedEntities));
+        $container->getDefinition('sonata.admin.audit.manager')->addMethodCall('setReader', array('marlinc.admin.audit.orm.reader', $auditedEntities));
     }
 
     /**

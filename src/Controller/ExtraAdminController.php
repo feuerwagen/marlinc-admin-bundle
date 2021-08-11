@@ -11,8 +11,8 @@
 
 namespace Marlinc\AdminBundle\Controller;
 
-use Marlinc\SonataExtraAdminBundle\Handler\SortableHandler;
-use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
+use Marlinc\AdminBundle\Handler\SortableHandler;
+use Marlinc\AdminBundle\Model\TrashManager;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -56,7 +56,7 @@ class ExtraAdminController extends CRUDController
                 'objectId' => $this->admin->getNormalizedIdentifier($object)
             ));
         }
-        $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_position_updated_successfully', array(), 'PicossSonataExtraAdminBundle'));
+        $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_position_updated_successfully', array(), 'MarlincAdminBundle'));
 
         return new RedirectResponse($this->admin->generateUrl('list', $this->admin->getFilterParameters()));
     }
@@ -97,7 +97,7 @@ class ExtraAdminController extends CRUDController
                     return $this->renderJson(array('result' => 'ok'));
                 }
 
-                $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_history_revert_successfull', array(), 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_history_revert_successfull', array(), 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -105,7 +105,7 @@ class ExtraAdminController extends CRUDController
                     return $this->renderJson(array('result' => 'error'));
                 }
 
-                $this->addFlash('sonata_flash_error', $this->get('translator')->trans('flash_history_revert_error', array(), 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_error', $this->get('translator')->trans('flash_history_revert_error', array(), 'MarlincAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));
@@ -185,7 +185,7 @@ class ExtraAdminController extends CRUDController
                     return $this->renderJson(array('result' => 'ok'));
                 }
 
-                $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_untrash_successfull', array(), 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_untrash_successfull', array(), 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -193,7 +193,7 @@ class ExtraAdminController extends CRUDController
                     return $this->renderJson(array('result' => 'error'));
                 }
 
-                $this->addFlash('sonata_flash_error', $this->get('translator')->trans('flash_untrash_error', array(), 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_error', $this->get('translator')->trans('flash_untrash_error', array(), 'MarlincAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));
