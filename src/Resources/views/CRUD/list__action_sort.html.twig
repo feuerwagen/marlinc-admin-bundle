@@ -17,12 +17,12 @@ file that was distributed with this source code.
 ] %}
 
 {% for move in moves %}
-    {% spaceless %}
+    {% apply spaceless %}
     {% set label = ('action_move_' ~ move.way)|trans({}, 'MarlincAdminBundle') %}
 
     <a class="btn btn-sm btn-default" href="{{ admin.generateObjectUrl('move', object, {'position': move.way}) }}" title="{{ label }}">
         <i class="glyphicon {{ move.icon }}"></i>
         {% if actions.hide_label is defined and actions.hide_label == false %}{{ label }}{% endif %}
     </a>
-    {% endspaceless %}
+    {% endapply %}
 {% endfor %}

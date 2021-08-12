@@ -9,10 +9,10 @@ file that was distributed with this source code.
 
 #}
 
-{% extends admin.getTemplate('base_list_field') %}
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
 
 {% block field %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set width = field_description.options.width is defined ? field_description.options.width : 50 %}
         {% set height = field_description.options.height is defined ? field_description.options.height : 50 %}
         {% if value %}
@@ -20,5 +20,5 @@ file that was distributed with this source code.
         {% else %}
             <div class="no-image" style="width:{{ width }}px; height:{{ height }}px;"></div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
