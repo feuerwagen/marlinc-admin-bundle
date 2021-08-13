@@ -33,6 +33,46 @@ class MarlincAdminController extends ExtraAdminController
             ] + parent::getSubscribedServices();
     }
 
+    public function listAction(Request $request): Response
+    {
+        $this->assertObjectExists($request);
+
+        $this->admin->checkAccess('list');
+
+        $preResponse = $this->preList($request);
+        if (null !== $preResponse) {
+            return $preResponse;
+        }
+
+        $listMode = $request->get('_list_mode');
+
+        if (null !== $listMode) {
+            $this->admin->setListMode($listMode);
+        }
+
+        $datagrid = $this->admin->getDatagrid();
+        $formView = $datagrid->getForm()->createView();
+
+        // set the theme for the current Admin Form
+        $this->setFormTheme($formView, $this->admin->getFilterTheme());
+
+        $template=$this->admin->getTemplateRegistry()->getTemplate('list');
+
+        if ($this->has(AdminExporter::class)) {
+            $exporter = $this->get(AdminExporter::class);
+            \assert($exporter instanceof AdminExporter);
+            $exportFormats = $exporter->getAvailableFormats($this->admin);
+        }
+
+        return $this->renderWithExtraParams($template, [
+            'action' => 'list',
+            'form' => $formView,
+            'datagrid' => $datagrid,
+            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $exportFormats ?? $this->admin->getExportFormats(),
+        ]);
+    }
+
     /**
      * @inheritdoc
      */
