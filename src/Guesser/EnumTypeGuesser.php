@@ -8,52 +8,37 @@
 
 namespace Marlinc\AdminBundle\Guesser;
 
-
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
-use Fresh\DoctrineEnumBundle\Exception\EnumTypeIsRegisteredButClassDoesNotExistException;
-use Sonata\AdminBundle\Model\ModelManagerInterface;
-use Sonata\DoctrineORMAdminBundle\Guesser\AbstractTypeGuesser;
+use Fresh\DoctrineEnumBundle\Exception\EnumType\EnumTypeIsRegisteredButClassDoesNotExistException;
+use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
+use Sonata\AdminBundle\FieldDescription\TypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class EnumTypeGuesser extends AbstractTypeGuesser
+class EnumTypeGuesser implements TypeGuesserInterface
 {
     /**
-     * @var AbstractEnumType[] Array of registered ENUM types
+     * @var array Array of registered doctrine types
      */
-    protected $registeredEnumTypes = [];
+    protected array $registeredTypes = [];
 
-    /**
-     * Constructor.
-     *
-     * @param array $registeredTypes Array of registered ENUM types
-     */
     public function __construct(array $registeredTypes)
     {
         foreach ($registeredTypes as $type => $details) {
-            $this->registeredEnumTypes[$type] = $details['class'];
+            $this->registeredTypes[$type] = $details['class'];
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function guessType($class, $property, ModelManagerInterface $modelManager)
+    public function guess(FieldDescriptionInterface $fieldDescription): ?TypeGuess
     {
-        if (!$ret = $this->getParentMetadataForProperty($class, $property, $modelManager)) {
-            return new TypeGuess('text', [], Guess::LOW_CONFIDENCE);
-        }
-
-        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $metadata */
-        list($metadata, $propertyName) = $ret;
-        $fieldType = $metadata->getTypeOfField($property);
+        $fieldType = $fieldDescription->getMappingType();
 
         // This is not one of the registered ENUM types
-        if (!isset($this->registeredEnumTypes[$fieldType])) {
-            return;
+        if (!isset($this->registeredTypes[$fieldType])) {
+            return null;
         }
 
-        $registeredEnumTypeFQCN = $this->registeredEnumTypes[$fieldType];
+        $registeredEnumTypeFQCN = $this->registeredTypes[$fieldType];
 
         if (!\class_exists($registeredEnumTypeFQCN)) {
             throw new EnumTypeIsRegisteredButClassDoesNotExistException(\sprintf(
@@ -64,7 +49,7 @@ class EnumTypeGuesser extends AbstractTypeGuesser
         }
 
         if (!\is_subclass_of($registeredEnumTypeFQCN, AbstractEnumType::class)) {
-            return;
+            return null;
         }
 
         // Get the choices from the fully qualified class name

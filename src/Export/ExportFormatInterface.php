@@ -15,53 +15,23 @@ use Sonata\Exporter\Source\SourceIteratorInterface;
 
 interface ExportFormatInterface
 {
-    /**
-     * @param string $name
-     * @param int $type
-     * @param TransformerInterface|null $transformer
-     * @param array $fields
-     * @param ExportHeader|null $header
-     * @param int|null $format
-     * @return ExportFormat
-     */
-    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, $fields = [''], ExportHeader $header = null, int $format = null);
+    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, array $fields = [''], ExportHeader $header = null, int $format = null): self;
 
-    /**
-     * @return array
-     */
-    public function getFiletypes(): array;
+    public function getFiletype(): string;
 
-    /**
-     * @param object $currentObject
-     * @return array
-     */
-    public function getRow($currentObject);
+    public function getRow(object $currentObject): array;
 
-    /**
-     * @return array
-     */
-    public function getHeader();
+    public function getHeader(): array;
 
-    public function createPropertyAccessor();
+    public function createPropertyAccessor(): self;
 
-    /**
-     * @param AdminInterface $admin
-     * @param string $filetype
-     * @return string
-     */
-    public function getFilename(AdminInterface $admin, $filetype);
+    public function getFilename(AdminInterface $admin, $filetype): string;
 
-    /**
-     * @return array
-     */
-    public function getColumnsType();
+    public function getColumnsType(): array;
 
     /**
      * Let the ExportFormat decide about the SourceIterator to use.
      * This is also the place to modify the query, if needed.
-     *
-     * @param Query $query
-     * @return SourceIteratorInterface
      */
-    public function getSourceIterator(Query $query);
+    public function getSourceIterator(Query $query): SourceIteratorInterface;
 }

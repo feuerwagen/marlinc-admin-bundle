@@ -8,11 +8,11 @@
 
 namespace Marlinc\AdminBundle\Controller;
 
-
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
-use Picoss\SonataExtraAdminBundle\Controller\ExtraAdminController;
+use Marlinc\AdminBundle\Bridge\AdminExporter;
+use Marlinc\SonataExtraAdminBundle\Controller\ExtraAdminController;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -23,30 +23,32 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
 
 class MarlincAdminController extends ExtraAdminController
 {
+    public static function getSubscribedServices(): array
+    {
+        return [
+            AdminExporter::class,
+        ] + parent::getSubscribedServices();
+    }
+
     /**
-     * Export data to specified format.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     *
-     * @throws AccessDeniedException If access is not granted
-     * @throws \RuntimeException     If the export format is invalid
+     * @inheritdoc
      */
-    public function exportAction(Request $request)
+    public function exportAction(Request $request): Response
     {
         $this->admin->checkAccess('export');
-        $adminExporter = $this->get('marlinc.admin.exporter');
+        $adminExporter = $this->get(AdminExporter::class);
 
         // Get service export name and file format from request
-        $filetype = $request->get('filetype');
         $format = $request->get('format');
 
         // Get the real format and filename to use.
         $exportFormat = $adminExporter->getExportFormat($this->admin, $format);
+        $filetype = $exportFormat->getFileType();
+
         $filename = $adminExporter->getExportFilename($this->admin, $exportFormat, $filetype);
 
         // Build query.
@@ -54,14 +56,17 @@ class MarlincAdminController extends ExtraAdminController
         $datagrid->buildPager();
 
         $query = $datagrid->getQuery();
-        $query->select('DISTINCT '.$query->getRootAlias());
+        $query->select('DISTINCT ' . $query->getRootAlias());
 
         // Reset page size restrictions
         $query->setFirstResult(null);
         $query->setMaxResults(null);
 
         if ($query instanceof ProxyQueryInterface) {
-            $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
+            if ($query->getSortBy() !== NULL) {
+                $query->addOrderBy($query->getSortBy(), $query->getSortOrder());
+            }
+
             $query = $query->getQuery();
         }
 
@@ -74,54 +79,11 @@ class MarlincAdminController extends ExtraAdminController
     }
 
     /**
-     * List action.
-     * Overridden to adapt to the needs of the improved export format.
-     *
-     * @return Response
-     *
-     * @throws AccessDeniedException If access is not granted
-     * @throws \Twig_Error_Runtime
-     */
-    public function listAction()
-    {
-        $request = $this->getRequest();
-
-        $this->admin->checkAccess('list');
-
-        $preResponse = $this->preList($request);
-        if ($preResponse !== null) {
-            return $preResponse;
-        }
-
-        if ($listMode = $request->get('_list_mode')) {
-            $this->admin->setListMode($listMode);
-        }
-
-        $datagrid = $this->admin->getDatagrid();
-        $formView = $datagrid->getForm()->createView();
-
-        // Set the theme for the current Admin form.
-        $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
-
-        // Get exporter service.
-        $exporter = $this->get('marlinc.admin.exporter');
-
-        return $this->renderWithExtraParams($this->admin->getTemplate('list'), [
-            'action' => 'list',
-            'form' => $formView,
-            'datagrid' => $datagrid,
-            'csrf_token' => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $exporter->getAvailableFormats($this->admin),
-        ]);
-    }
-
-    /**
      * Return the Response object associated to the trash action.
      * Overridden to fix the invocation of the softdeleteable trash filter.
      *
      * @return Response
-     * @throws AccessDeniedException
-     * @throws \Twig_Error_Runtime
+     * @throws AccessDeniedException|\Twig\Error\RuntimeError
      */
     public function trashAction()
     {
@@ -145,12 +107,12 @@ class MarlincAdminController extends ExtraAdminController
         $this->get('twig')->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
         // Get exporter service.
-        $exporter = $this->get('marlinc.admin.exporter');
+        $exporter = $this->get(AdminExporter::class);
 
         return $this->renderWithExtraParams($this->admin->getTemplate('trash'), [
-            'action'     => 'trash',
-            'form'       => $formView,
-            'datagrid'   => $datagrid,
+            'action' => 'trash',
+            'form' => $formView,
+            'datagrid' => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $exporter->getAvailableFormats($this->admin),
         ]);
@@ -161,7 +123,7 @@ class MarlincAdminController extends ExtraAdminController
      * @param $id
      * @return Response
      */
-    public function untrashAction(Request $request, $id)
+    public function untrashAction(Request $request, $id,TrashManager $trashManager)
     {
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine()->getManager();
@@ -203,8 +165,8 @@ class MarlincAdminController extends ExtraAdminController
         }
 
         return $this->renderWithExtraParams($this->admin->getTemplate('untrash'), [
-            'object'     => $object,
-            'action'     => 'untrash',
+            'object' => $object,
+            'action' => 'untrash',
             'csrf_token' => $this->getCsrfToken('sonata.untrash')
         ]);
     }
@@ -214,11 +176,11 @@ class MarlincAdminController extends ExtraAdminController
      *
      * @param int|string|null $id
      *
-     * @throws NotFoundHttpException If the object does not exist
+     * @return Response|RedirectResponse
      * @throws AccessDeniedException If access is not granted
      * @throws \Exception
      *
-     * @return Response|RedirectResponse
+     * @throws NotFoundHttpException If the object does not exist
      */
     public function realdeleteAction($id)
     {
@@ -354,7 +316,7 @@ class MarlincAdminController extends ExtraAdminController
         $em->getFilters()->enable('softdeleteabletrash');
 
         try {
-            $query->select('DISTINCT '.current($query->getRootAliases()));
+            $query->select('DISTINCT ' . current($query->getRootAliases()));
 
             try {
                 $i = 0;
@@ -422,7 +384,7 @@ class MarlincAdminController extends ExtraAdminController
         if ($parentAdmin->getObject($parentId) !== $propertyAccessor->getValue($object, $propertyPath)) {
             // NEXT_MAJOR: make this exception
             @trigger_error("Accessing a child that isn't connected to a given parent is deprecated since 3.34"
-                ." and won't be allowed in 4.0.",
+                . " and won't be allowed in 4.0.",
                 E_USER_DEPRECATED
             );
         }

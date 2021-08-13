@@ -10,14 +10,9 @@
             <argument type="service" id="phpspreadsheet"/>
             <argument>%writer.xlsx.filename%</argument>
         </service>
-        <service id="marlinc.admin.exporter" class="Marlinc\AdminBundle\Bridge\AdminExporter">
-            <argument type="service" id="sonata.exporter.exporter"/>
+        <service id="Marlinc\AdminBundle\Bridge\AdminExporter" decorates="sonata.admin.admin_exporter">
         </service>
         <service id="phpspreadsheet" class="%phpspreadsheet.class%" />
-        <service id="marlinc.admin.filter.model" class="Marlinc\AdminBundle\Filter\ModelFilter">
-            <argument type="service" id="doctrine.orm.entity_manager" />
-            <tag name="sonata.admin.filter.type" alias="doctrine_orm_model" />
-        </service>
         <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension">
             <tag name="sonata.admin.extension" global="true" />
             <argument type="service" id="security.token_storage"/>
@@ -29,20 +24,27 @@
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
         </service>
+        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder">
+            <argument type="service" id="sonata.admin.route.path_info"/>
+            <argument type="service" id="sonata.admin.audit.manager" />
+            <argument type="service" id="picoss.sonataextraadmin.trash.manager"/>
+        </service>
         <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
             <argument>%doctrine.dbal.connection_factory.types%</argument>
             <tag name="sonata.admin.guesser.orm_list" />
         </service>
-        <service id="sonata.admin.builder.orm_list" class="Marlinc\AdminBundle\Builder\ListBuilder">
-            <argument type="service" id="sonata.admin.guesser.orm_list_chain"/>
-            <argument/>
+        <service id="Marlinc\AdminBundle\Builder\ListBuilder"  decorates="sonata.admin.builder.orm_list">
+            <argument type="service" id=".inner"/>
+            <argument type="service" id="sonata.admin.guesser.orm_list_chain"/><argument/>
         </service>
-        <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder" parent="picoss.sonataextraadmin.route.entity" />
         <service id="Marlinc\AdminBundle\Form\WormExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
         <service id="Marlinc\AdminBundle\Form\DependencyExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+        </service>
+        <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" public="true">
+            <tag name="sonata.admin.extension" global="true" />
         </service>
     </services>
 </container>

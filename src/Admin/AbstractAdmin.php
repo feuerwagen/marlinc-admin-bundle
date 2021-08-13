@@ -10,12 +10,13 @@ namespace Marlinc\AdminBundle\Admin;
 
 
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
-use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
+use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
 use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Countries;
 
 abstract class AbstractAdmin extends BaseAdmin
 {
@@ -60,16 +61,17 @@ abstract class AbstractAdmin extends BaseAdmin
     private $datagridMode = AbstractAdmin::MODE_LIST;
 
     protected function getFilteredLanguages() {
-        $languages = array_flip($this->getConfigurationPool()->getContainer()->getParameter('marlinc_languages'));
-
-        return array_intersect_key(Intl::getLanguageBundle()->getLanguageNames(), $languages);
+        \Locale::setDefault('en');
+        return Languages::getNames();
     }
 
     protected function getFilteredCountries() {
-        $countries = array_flip($this->getConfigurationPool()->getContainer()->getParameter('marlinc_countries'));
-
-        return array_intersect_key(Intl::getRegionBundle()->getCountryNames(), $countries);
+        \Locale::setDefault('en');
+        return Countries::getNames();
     }
+
+    // TODO: the following methods are intended to extend the normal list view with a variant for a trash list.
+    //  Update this to SonataAdmin 4.x, preferably by using the provided extesion points.
 
     /**
      * @inheritDoc
@@ -80,52 +82,7 @@ abstract class AbstractAdmin extends BaseAdmin
             return '@MarlincAdmin/edit/batch_trash_confirmation.html.twig';
         }
 
-        return parent::getTemplate($name);
-    }
-
-    public function getBatchActions()
-    {
-        if ($this->datagridMode == 'list') {
-            return parent::getBatchActions();
-        }
-
-        // Override batch actions while in trash mode.
-        $actions = [];
-
-        if ($this->hasRoute('realdelete') && $this->hasAccess('delete')) {
-            $actions['realdelete'] = [
-                'label' => 'action_real_delete',
-                'translation_domain' => 'MarlincAdminBundle',
-                'ask_confirmation' => true, // by default always true
-            ];
-        }
-
-        if ($this->hasRoute('untrash') && $this->hasAccess('edit')) {
-            $actions['untrash'] = [
-                'label' => 'action_restore',
-                'translation_domain' => 'PicossSonataExtraAdminBundle',
-                'ask_confirmation' => true, // by default always true
-            ];
-        }
-
-        foreach ($actions  as $name => &$action) {
-            if (!array_key_exists('label', $action)) {
-                $action['label'] = $this->getTranslationLabel($name, 'batch', 'label');
-            }
-
-            if (!array_key_exists('translation_domain', $action)) {
-                $action['translation_domain'] = $this->getTranslationDomain();
-            }
-        }
-
-        return $actions;
-    }
-
-    public function getList()
-    {
-        $this->buildList();
-
-        return $this->list;
+        return $this->getTemplateRegistry()->getTemplate($name);
     }
 
     public function getDatagridMode()
@@ -197,59 +154,6 @@ abstract class AbstractAdmin extends BaseAdmin
         }
     }
 
-    protected function buildList()
-    {
-        if ($this->list) {
-            return;
-        }
-
-        $this->list = $this->getListBuilder()->getBaseList();
-
-        $mapper = new ListMapper($this->getListBuilder(), $this->list, $this);
-
-        if (count($this->getBatchActions()) > 0) {
-            $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
-                $this->getClass(),
-                'batch',
-                [
-                    'label' => 'batch',
-                    'code' => '_batch',
-                    'sortable' => false,
-                    'virtual_field' => true,
-                ]
-            );
-
-            $fieldDescription->setAdmin($this);
-            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('batch'));
-
-            $mapper->add($fieldDescription, 'batch');
-        }
-
-        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
-            $this->configureTrashFields($mapper);
-        } else {
-            $this->configureListFields($mapper);
-        }
-
-        if ($this->hasRequest() && $this->getRequest()->isXmlHttpRequest()) {
-            $fieldDescription = $this->getModelManager()->getNewFieldDescriptionInstance(
-                $this->getClass(),
-                'select',
-                [
-                    'label' => false,
-                    'code' => '_select',
-                    'sortable' => false,
-                    'virtual_field' => false,
-                ]
-            );
-
-            $fieldDescription->setAdmin($this);
-            $fieldDescription->setTemplate($this->getTemplateRegistry()->getTemplate('select'));
-
-            $mapper->add($fieldDescription, 'select');
-        }
-    }
-
     protected function configureTrashFields(ListMapper $mapper)
     {
         $mapper
@@ -263,7 +167,7 @@ abstract class AbstractAdmin extends BaseAdmin
         ;
     }
 
-    protected function configureListFields(ListMapper $list)
+    protected function configureListFields(ListMapper $list):void
     {
         $list
             ->add('_action', null, [

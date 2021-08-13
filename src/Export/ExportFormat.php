@@ -20,54 +20,35 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ExportFormat implements ExportFormatInterface
 {
-    /**
-     * @var array
-     */
-    protected $filetypes = ['xlsx'];
+    protected string $filetype = 'xlsx';
 
     /**
      * @var ExportColumn[]
      */
-    protected $columns;
+    protected array $columns = [];
 
     /**
      * @var PropertyPath[]
      */
-    protected $propertyPaths;
+    protected array $propertyPaths = [];
 
     /**
      * @var PropertyAccessor
      */
-    protected $propertyAccessor;
+    protected PropertyAccessor $propertyAccessor;
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param TransformerInterface|null $transformer
-     * @param array $fields
-     * @param ExportHeader|null $header
-     * @param int|null $format
-     * @return ExportFormat
+     * @inheritdoc
      */
-    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, $fields = [''], ExportHeader $header = null, int $format = null) {
+    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, $fields = [''], ExportHeader $header = null, int $format = null): self
+    {
         $this->columns[] = new ExportColumn($name, $type, $transformer, $fields, $header, $format);
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFiletypes(): array
+    public function getRow(object $currentObject): array
     {
-        return $this->filetypes;
-    }
-
-    /**
-     * @param object $currentObject
-     * @return array
-     */
-    public function getRow($currentObject) {
         $data = [];
 
         foreach ($this->columns as $column) {
@@ -78,10 +59,8 @@ class ExportFormat implements ExportFormatInterface
         return $data;
     }
 
-    /**
-     * @return array
-     */
-    public function getHeader() {
+    public function getHeader(): array
+    {
         $hasGroupHeaders = false;
         /** @var ExportHeader[] $headers */
         $headers = [];
@@ -118,7 +97,7 @@ class ExportFormat implements ExportFormatInterface
         return $data;
     }
 
-    public function createPropertyAccessor()
+    public function createPropertyAccessor(): self
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->propertyPaths = [];
@@ -130,14 +109,12 @@ class ExportFormat implements ExportFormatInterface
                 }
             }
         }
+
+        return $this;
     }
 
-    /**
-     * @param AdminInterface $admin
-     * @param string $filetype
-     * @return string
-     */
-    public function getFilename(AdminInterface $admin, $filetype) {
+    public function getFilename(AdminInterface $admin, $filetype): string
+    {
         $class = $admin->getClass();
 
         return sprintf(
@@ -148,10 +125,7 @@ class ExportFormat implements ExportFormatInterface
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getColumnsType()
+    public function getColumnsType(): array
     {
         $types = [];
 
@@ -164,13 +138,15 @@ class ExportFormat implements ExportFormatInterface
     }
 
     /**
-     * Let the ExportFormat decide about the SourceIterator to use.
-     * This is also the place to modify the query, if needed.
-     *
-     * @param Query $query
-     * @return SourceIteratorInterface
+     * @inheritdoc
      */
-    public function getSourceIterator(Query $query) {
+    public function getSourceIterator(Query $query): SourceIteratorInterface
+    {
         return new ComplexStructureSourceIterator($query, $this);
+    }
+
+    public function getFileType(): string
+    {
+        return  $this->filetype;
     }
 }

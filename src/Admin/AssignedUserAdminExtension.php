@@ -41,9 +41,8 @@ class AssignedUserAdminExtension extends AbstractAdminExtension
     /**
      * @param AdminInterface $admin
      * @param ProxyQueryInterface|QueryBuilder $query
-     * @param string $context
      */
-    public function configureQuery(AdminInterface $admin, ProxyQueryInterface $query, $context = 'list')
+    public function configureQuery(AdminInterface $admin, ProxyQueryInterface $query): void
     {
         $entityClass = $admin->getClass();
 

@@ -8,7 +8,6 @@
 
 namespace Marlinc\AdminBundle\Form;
 
-
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -86,5 +85,10 @@ class DependencyExtension extends AbstractTypeExtension
                 $view->vars['attr'] = array_merge_recursive($view->vars['attr'], $attributes);
             }
         }
+    }
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [FormType::class];
     }
 }

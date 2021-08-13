@@ -253,7 +253,7 @@ class XmlExcelWriter implements ComplexWriterInterface
     /**
      * @inheritdoc
      */
-    public function getDefaultMimeType()
+    public function getDefaultMimeType(): string
     {
         return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     }
@@ -261,7 +261,7 @@ class XmlExcelWriter implements ComplexWriterInterface
     /**
      * @inheritdoc
      */
-    public function getFormat()
+    public function getFormat(): string
     {
         return 'xlsx';
     }
