@@ -25,6 +25,7 @@ class MarlincAdminExtension extends Extension
         $loader->load('services.xml');
 
         $bundles = $container->getParameter('kernel.bundles');
+
         if (isset($bundles['SonataDoctrineORMAdminBundle'])) {
             $loader->load('ORM/sortable.xml');
 
