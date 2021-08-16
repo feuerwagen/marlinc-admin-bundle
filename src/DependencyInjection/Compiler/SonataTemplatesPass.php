@@ -12,9 +12,35 @@ class SonataTemplatesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $extraTemplates = $container->getParameter('marlinc_admin');
+        $extraTemplates = [
+            'realdelete' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'history' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'history_revert' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'history_revision_timestamp' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'trash' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'untrash' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'inner_trash_list_row' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'button_trash' => '@MarlincAdmin/edit/realdelete.html.twig',
+            'types' => [
+                'list' => [
+                    'image' => '@MarlincAdmin/CRUD/list_image.html.twig',
+                    'string_template' => '@MarlincAdmin/CRUD/list_string_template.html.twig',
+                    'progress_bar' => '@MarlincAdmin/CRUD/list_progress_bar.html.twig',
+                    'label' => '@MarlincAdmin/CRUD/list_label.html.twig',
+                    'badge' => '@MarlincAdmin/CRUD/list_badge.html.twig',
+                ],
+                'show' => [
+                    'image' => '@MarlincAdmin/CRUD/show_image.html.twig',
+                    'string_template' => '@MarlincAdmin/CRUD/show_string_template.html.twig',
+                    'progress_bar' => '@MarlincAdmin/CRUD/show_progress_bar.html.twig',
+                    'label' => '@MarlincAdmin/CRUD/show_label.html.twig',
+                    'badge' => '@MarlincAdmin/CRUD/show_badge.html.twig',
+                ]
+            ]
+        ];
 
         $bundles = $container->getParameter('kernel.bundles');
+
         if (isset($bundles['SonataDoctrineORMAdminBundle'])) {
             $templates = array_merge_recursive($extraTemplates, $container->getParameter('sonata_doctrine_orm_admin.templates'));
             $container->setParameter('sonata_doctrine_orm_admin.templates', $templates);
@@ -50,7 +76,7 @@ class SonataTemplatesPass implements CompilerPassInterface
             $container->getDefinition('sonata.admin.builder.doctrine_phpcr_show')
                 ->replaceArgument(1, $templates['types']['show']);
         }
-        
+
         $doctrineTemplates = $container->getParameter('sonata_doctrine_orm_admin.templates');
 
         $container->setParameter('sonata_doctrine_orm_admin.templates', array_merge_recursive($extraTemplates, $doctrineTemplates));
