@@ -11,13 +11,15 @@ namespace Marlinc\AdminBundle\Export;
 
 use Doctrine\ORM\Query;
 use Marlinc\AdminBundle\Source\SummarizingSourceIterator;
+use Sonata\Exporter\Source\SourceIteratorInterface;
+
 
 abstract class SummarizingExportFormat extends ExportFormat implements SummarizingExportFormatInterface
 {
     /**
      * @inheritDoc
      */
-    public function getSourceIterator(Query $query)
+    public function getSourceIterator(Query $query):SourceIteratorInterface
     {
         return new SummarizingSourceIterator($query, $this);
     }

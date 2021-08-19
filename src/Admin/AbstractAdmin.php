@@ -170,13 +170,13 @@ abstract class AbstractAdmin extends BaseAdmin
     protected function configureListFields(ListMapper $list):void
     {
         $list
-            ->add('_action', null, [
+            ->add('action', 'actions', [
                 'actions' => [
                     'show' => [],
                     'edit' => [],
-                    'delete' => [],
-                ]
-            ])
+                    'delete' => []
+                ],
+            ]);
         ;
     }
 }

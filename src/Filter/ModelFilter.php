@@ -15,6 +15,7 @@ use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter as BaseFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\Filter;
+use Sonata\AdminBundle\Filter\Model\FilterData;
 
 class ModelFilter extends Filter
 {
@@ -39,7 +40,7 @@ class ModelFilter extends Filter
         $this->decorated = $decorated;
     }
 
-    public function filter(ProxyQueryInterface $query, string $alias, string $field, array $data): void
+    public function filter(ProxyQueryInterface $query, string $alias, string $field, FilterData $data): void
     {
         $this->decorated->filter($query,$alias,$field,$data);
     }
