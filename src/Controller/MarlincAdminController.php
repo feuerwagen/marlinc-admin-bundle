@@ -12,7 +12,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
 use Marlinc\AdminBundle\Bridge\AdminExporter;
-use Marlinc\SonataExtraAdminBundle\Controller\ExtraAdminController;
+use Marlinc\AdminBundle\Handler\SortableHandler;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -23,15 +23,146 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Marlinc\SonataExtraAdminBundle\Model\TrashManager;
+use Marlinc\AdminBundle\Model\TrashManager;
+use Sonata\AdminBundle\Controller\CRUDController;
 
-class MarlincAdminController extends ExtraAdminController
+class MarlincAdminController extends CRUDController
 {
+    /**
+     * Move element
+     *
+     * @param integer $id
+     * @param integer|null $childId
+     * @param string $position
+     *
+     * @return Response
+     */
+    public function moveAction($id, $childId = null, $position, SortableHandler $sortableHandler)
+    {
+        $objectId = $childId !== null ? $childId : $id;
+
+        $object = $this->admin->getObject($objectId);
+
+        $lastPosition = $sortableHandler->getLastPosition($object);
+        $position = $sortableHandler->getPosition($object, $position, $lastPosition);
+
+        $object->setPosition($position);
+        $this->admin->update($object);
+
+        if ($this->isXmlHttpRequest()) {
+            return $this->renderJson(array(
+                'result' => 'ok',
+                'objectId' => $this->admin->getNormalizedIdentifier($object)
+            ));
+        }
+        $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_position_updated_successfully', array(), 'MarlincAdminBundle'));
+
+        return new RedirectResponse($this->admin->generateUrl('list', $this->admin->getFilterParameters()));
+    }
+
+    /**
+     * Revert hystory
+     *
+     * @param Request $request
+     * @param int $id
+     * @param int $revision
+     *
+     * @return RedirectResponse|Response
+     */
+    public function historyRevertAction(Request $request, $id, $revision)
+    {
+        $id = $request->get($this->admin->getIdParameter());
+        $object = $this->admin->getObject($id);
+
+        if (!$object) {
+            throw new NotFoundHttpException(sprintf('unable to find the object with id : %s', $id));
+        }
+
+        if ($request->getMethod() == 'POST') {
+            // check the csrf token
+            $this->validateCsrfToken('sonata.history.revert');
+
+            try {
+                $manager = $this->get('sonata.admin.audit.manager');
+
+                if (!$manager->hasReader($this->admin->getClass())) {
+                    throw new NotFoundHttpException(sprintf('unable to find the audit reader for class : %s', $this->admin->getClass()));
+                }
+
+                $reader = $manager->getReader($this->admin->getClass());
+                $reader->revert($object, $revision);
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(array('result' => 'ok'));
+                }
+
+                $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_history_revert_successfull', array(), 'MarlincAdminBundle'));
+
+            } catch (ModelManagerException $e) {
+
+                if ($this->isXmlHttpRequest()) {
+                    return $this->renderJson(array('result' => 'error'));
+                }
+
+                $this->addFlash('sonata_flash_error', $this->get('translator')->trans('flash_history_revert_error', array(), 'MarlincAdminBundle'));
+            }
+
+            return new RedirectResponse($this->admin->generateUrl('list'));
+        }
+
+        return $this->renderWithExtraParams($this->admin->getTemplate('history_revert'), array(
+            'object' => $object,
+            'revision' => $revision,
+            'action' => 'revert',
+            'csrf_token' => $this->getCsrfToken('sonata.history.revert')
+        ));
+    }
+
     public static function getSubscribedServices(): array
     {
         return [
-            AdminExporter::class,
-        ] + parent::getSubscribedServices();
+                AdminExporter::class,
+            ] + parent::getSubscribedServices();
+    }
+
+    public function listAction(Request $request): Response
+    {
+        $this->assertObjectExists($request);
+
+        $this->admin->checkAccess('list');
+
+        $preResponse = $this->preList($request);
+        if (null !== $preResponse) {
+            return $preResponse;
+        }
+
+        $listMode = $request->get('_list_mode');
+
+        if (null !== $listMode) {
+            $this->admin->setListMode($listMode);
+        }
+
+        $datagrid = $this->admin->getDatagrid();
+        $formView = $datagrid->getForm()->createView();
+
+        // set the theme for the current Admin Form
+        $this->setFormTheme($formView, $this->admin->getFilterTheme());
+
+        $template=$this->admin->getTemplateRegistry()->getTemplate('list');
+
+        if ($this->has(AdminExporter::class)) {
+            $exporter = $this->get(AdminExporter::class);
+            \assert($exporter instanceof AdminExporter);
+            $exportFormats = $exporter->getAvailableFormats($this->admin);
+        }
+
+        return $this->renderWithExtraParams($template, [
+            'action' => 'list',
+            'form' => $formView,
+            'datagrid' => $datagrid,
+            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $exportFormats ?? $this->admin->getExportFormats(),
+        ]);
     }
 
     /**
@@ -150,7 +281,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'ok']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_successfull', [], 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
 
@@ -158,7 +289,7 @@ class MarlincAdminController extends ExtraAdminController
                     return $this->renderJson(['result' => 'error']);
                 }
 
-                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'PicossSonataExtraAdminBundle'));
+                $this->addFlash('sonata_flash_info', $this->get('translator')->trans('flash_untrash_error', [], 'MarlincAdminBundle'));
             }
 
             return new RedirectResponse($this->admin->generateUrl('list'));
@@ -368,25 +499,5 @@ class MarlincAdminController extends ExtraAdminController
         }
 
         return $this->redirect($this->admin->generateUrl('trash', $parameters));
-    }
-
-    private function checkParentChildAssociation(Request $request, $object)
-    {
-        if (!($parentAdmin = $this->admin->getParent())) {
-            return;
-        }
-
-        $parentId = $request->get($parentAdmin->getIdParameter());
-
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $propertyPath = new PropertyPath($this->admin->getParentAssociationMapping());
-
-        if ($parentAdmin->getObject($parentId) !== $propertyAccessor->getValue($object, $propertyPath)) {
-            // NEXT_MAJOR: make this exception
-            @trigger_error("Accessing a child that isn't connected to a given parent is deprecated since 3.34"
-                . " and won't be allowed in 4.0.",
-                E_USER_DEPRECATED
-            );
-        }
     }
 }

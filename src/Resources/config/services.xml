@@ -10,8 +10,7 @@
             <argument type="service" id="phpspreadsheet"/>
             <argument>%writer.xlsx.filename%</argument>
         </service>
-        <service id="Marlinc\AdminBundle\Bridge\AdminExporter" decorates="sonata.admin.admin_exporter">
-        </service>
+        <service id="Marlinc\AdminBundle\Bridge\AdminExporter" />
         <service id="phpspreadsheet" class="%phpspreadsheet.class%" />
         <service id="Marlinc\AdminBundle\Admin\AssignedUserAdminExtension">
             <tag name="sonata.admin.extension" global="true" />
@@ -27,7 +26,7 @@
         <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder">
             <argument type="service" id="sonata.admin.route.path_info"/>
             <argument type="service" id="sonata.admin.audit.manager" />
-            <argument type="service" id="picoss.sonataextraadmin.trash.manager"/>
+            <argument type="service" id="marlinc.admin.trash.manager"/>
         </service>
         <service id="Marlinc\AdminBundle\Guesser\EnumTypeGuesser">
             <argument>%doctrine.dbal.connection_factory.types%</argument>
@@ -45,6 +44,17 @@
         </service>
         <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" public="true">
             <tag name="sonata.admin.extension" global="true" />
+        </service>
+        <service id="marlinc.admin.twig.extension.stringloader" class="Twig\Extension\StringLoaderExtension">
+            <tag name="twig.extension"/>
+        </service>
+        <service id="marlinc.admin.trash.manager" class="Marlinc\AdminBundle\Model\TrashManager">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="marlinc.admin.route.entity" class="Marlinc\AdminBundle\Route\AddManagerRoutesBuilder">
+            <argument type="service" id="sonata.admin.route.path_info"/>
+            <argument type="service" id="sonata.admin.audit.manager"/>
+            <argument type="service" id="marlinc.admin.trash.manager"/>
         </service>
     </services>
 </container>
