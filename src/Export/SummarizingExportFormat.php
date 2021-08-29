@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 07.12.17
- * Time: 14:18
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Export;
 
@@ -19,7 +14,7 @@ abstract class SummarizingExportFormat extends ExportFormat implements Summarizi
     /**
      * @inheritDoc
      */
-    public function getSourceIterator(Query $query):SourceIteratorInterface
+    public function getSourceIterator(Query $query): SourceIteratorInterface
     {
         return new SummarizingSourceIterator($query, $this);
     }
@@ -27,7 +22,7 @@ abstract class SummarizingExportFormat extends ExportFormat implements Summarizi
     /**
      * @inheritDoc
      */
-    public function completeGrid(array &$results)
+    public function completeGrid(array &$results): void
     {
         // Do nothing per default.
     }

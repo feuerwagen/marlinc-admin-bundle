@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Builder;
 
@@ -8,6 +9,9 @@ use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\DoctrineORMAdminBundle\Builder\ListBuilder as SonataListBuilder;
 
+/**
+ * Default @see SonataListBuilder + Add options from guessed field type to the field description
+ */
 final class ListBuilder implements ListBuilderInterface
 {
     private SonataListBuilder $decorated;
@@ -37,6 +41,23 @@ final class ListBuilder implements ListBuilderInterface
             }
 
             $fieldDescription->setType($guessType->getType());
+        } else {
+            $fieldDescription->setType($type);
+        }
+
+        $this->fixFieldDescription($fieldDescription);
+
+        if (null === $type) {
+            $guessType = $this->guesser->guess($fieldDescription);
+            if (null === $guessType) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Cannot guess a type for the field description "%s", You MUST provide a type.',
+                    $fieldDescription->getName()
+                ));
+            }
+
+            $fieldDescription->setType($guessType->getType());
+            // This is the only change compared to the decorated service.
             $fieldDescription->setOptions(array_merge($guessType->getOptions(), $fieldDescription->getOptions()));
         } else {
             $fieldDescription->setType($type);

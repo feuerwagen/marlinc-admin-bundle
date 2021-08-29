@@ -1,24 +1,13 @@
 <?php
-
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class AddTrashEntityCompilerPass
- *
- * @author Romain Honel <romain.honel@gmail.com>
+ * Register the trash reader for all entities with an admin that is enabled for trash view.
  */
 class AddTrashEntityCompilerPass implements CompilerPassInterface
 {
@@ -31,14 +20,9 @@ class AddTrashEntityCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $trashedEntities = array();
+        $trashedEntities = [];
         foreach ($container->findTaggedServiceIds('sonata.admin') as $id => $attributes) {
-
-            if ($attributes[0]['manager_type'] != 'orm') {
-                continue;
-            }
-
-            if (!isset($attributes[0]['trash']) || $attributes[0]['trash'] == false) {
+            if ($attributes[0]['manager_type'] != 'orm' || !isset($attributes[0]['trash']) || $attributes[0]['trash'] == false) {
                 continue;
             }
 
@@ -48,16 +32,10 @@ class AddTrashEntityCompilerPass implements CompilerPassInterface
 
         $trashedEntities = array_unique($trashedEntities);
 
-        $container->getDefinition('marlinc.admin.trash.manager')->addMethodCall('setReader', array('marlinc.admin.trash.manager', $trashedEntities));
+        $container->getDefinition('marlinc.admin.trash.manager')->addMethodCall('setReader', ['marlinc.admin.trash.manager', $trashedEntities]);
     }
 
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getModelName(ContainerBuilder $container, $name)
+    private function getModelName(ContainerBuilder $container, string $name): string
     {
         if ($name[0] == '%') {
             return $container->getParameter(substr($name, 1, -1));

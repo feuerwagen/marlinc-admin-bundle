@@ -7,7 +7,7 @@ $(document).ready(function() {
         var $source = $($target.data('source'));
 
         if ($(this).data('type') === 'checkbox') {
-            if ($source.val() != $target.data('value')) {
+            if ($source.val() !== $target.data('value')) {
                 $targetWrapper.hide();
             }
 
@@ -17,13 +17,13 @@ $(document).ready(function() {
         } else if ($(this).data('type') === 'text' || $(this).data('type') === 'select') {
             switch ($target.data('comparison')) {
                 case '!=':
-                    if ($source.val() == $target.data('value')) {
+                    if ($source.val() === $target.data('value')) {
                         $targetWrapper.hide();
                         return;
                     }
                     break;
                 default:
-                    if ($source.val() != $target.data('value')) {
+                    if ($source.val() !== $target.data('value')) {
                         $targetWrapper.hide();
                         return;
                     }
@@ -33,13 +33,13 @@ $(document).ready(function() {
             $source.on('change', function() {
                 switch ($target.data('comparison')) {
                     case '!=':
-                        if ($(this).val() != $target.data('value')) {
+                        if ($(this).val() !== $target.data('value')) {
                             $targetWrapper.slideDown();
                             return;
                         }
                         break;
                     default:
-                        if ($(this).val() == $target.data('value')) {
+                        if ($(this).val() === $target.data('value')) {
                             $targetWrapper.slideDown();
                             return;
                         }
@@ -61,13 +61,13 @@ $(document).ready(function() {
                     }
                     break;
                 case '=':
-                    if ($source.val() != $target.data('value')) {
+                    if ($source.val() !== $target.data('value')) {
                         $targetWrapper.hide();
                         return;
                     }
                     break;
                 default:
-                    if ($source.val() == $target.data('value')) {
+                    if ($source.val() === $target.data('value')) {
                         $targetWrapper.hide();
                         return;
                     }
@@ -89,13 +89,13 @@ $(document).ready(function() {
                         }
                         break;
                     case '=':
-                        if ($(this).val() == $target.data('value')) {
+                        if ($(this).val() === $target.data('value')) {
                             $targetWrapper.slideDown();
                             return;
                         }
                         break;
                     default:
-                        if ($(this).val() != $target.data('value')) {
+                        if ($(this).val() !== $target.data('value')) {
                             $targetWrapper.slideDown();
                             return;
                         }

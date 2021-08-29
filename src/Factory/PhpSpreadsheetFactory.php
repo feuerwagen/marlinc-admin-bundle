@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Factory;
 
@@ -6,34 +7,30 @@ use PhpOffice\PhpSpreadsheet\Helper\Html;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PhpSpreadsheetFactory
 {
-    const FROMAT_CSV = 'Csv';
+    const FORMAT_CSV = 'Csv';
     const FORMAT_XLSX = 'Xlsx';
     const FORMAT_XLS = 'Xls';
     const FORMAT_ODS = 'Ods';
-    const FORMAT_PDF = 'Pdf';
+    const FORMAT_PDF = 'Pdf'; // TODO Needs to be Tcpdf, Dompdf or Mpdf
 
     /**
      * Creates an empty spreadsheet object if the filename is empty, otherwise loads the file into the object.
-     *
-     * @param string $filename
-     * @return Spreadsheet
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function createSpreadsheet($filename = null)
+    public function createSpreadsheet(?string $filename = null): Spreadsheet
     {
         return (null === $filename) ? new Spreadsheet() : IOFactory::load($filename);
     }
 
     /**
-     * Create a worksheet drawing
-     * @return Drawing
+     * Create a worksheet drawing.
      */
-    public function createWorksheetDrawing()
+    public function createWorksheetDrawing(): Drawing
     {
         return new Drawing();
     }
@@ -42,25 +39,17 @@ class PhpSpreadsheetFactory
      * Create a writer given the spreadsheet object and the type.
      * The type should be one of \PhpOffice\PhpSpreadsheet\IOFactory::$_autoResolveClasses
      *
-     * @param Spreadsheet $object
-     * @param string $type
-     * @return IWriter
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws Exception
      */
-    public function createWriter(Spreadsheet $object, $type = self::FORMAT_XLS)
+    public function createWriter(Spreadsheet $object, string $type = self::FORMAT_XLS): IWriter
     {
         return IOFactory::createWriter($object, $type);
     }
 
     /**
      * Stream the file as Response.
-     *
-     * @param IWriter $writer
-     * @param int $status
-     * @param array $headers
-     * @return StreamedResponse
      */
-    public function createStreamedResponse(IWriter $writer, $status = 200, $headers = array())
+    public function createStreamedResponse(IWriter $writer, int $status = 200, array $headers = []): StreamedResponse
     {
         return new StreamedResponse(
             function () use ($writer) {
@@ -72,11 +61,9 @@ class PhpSpreadsheetFactory
     }
 
     /**
-     * Create a Helper HTML Object
-     *
-     * @return Html
+     * Create a Helper HTML Object.
      */
-    public function createHelperHTML()
+    public function createHelperHTML(): Html
     {
         return new Html();
     }

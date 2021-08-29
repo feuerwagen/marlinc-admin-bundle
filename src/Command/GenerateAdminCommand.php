@@ -1,13 +1,5 @@
 <?php
 
-/*
- * This file is part of the Sonata Project package.
- *
- * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace Marlinc\AdminBundle\Command;
 
@@ -27,8 +19,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * @author Marek Stipek <mario.dweller@seznam.cz>
- * @author Simon Cosandey <simon.cosandey@simseo.ch>
+ * TODO: Replace with a maker command
  */
 class GenerateAdminCommand extends QuestionableCommand
 {

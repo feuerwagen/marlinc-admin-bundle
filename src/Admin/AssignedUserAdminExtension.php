@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 20.04.18
- * Time: 16:36
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Admin;
 
 
-use Doctrine\ORM\QueryBuilder;
 use Marlinc\AdminBundle\Entity\EntityAssignedUsersInterface;
 use Sonata\AdminBundle\Admin\AbstractAdminExtension;
 use Sonata\AdminBundle\Admin\AdminInterface;
@@ -19,31 +13,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AssignedUserAdminExtension extends AbstractAdminExtension
 {
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
 
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $authChecker;
+    private AuthorizationCheckerInterface $authChecker;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param AuthorizationCheckerInterface $authChecker
-     */
     public function __construct(TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authChecker) {
         $this->tokenStorage = $tokenStorage;
         $this->authChecker = $authChecker;
     }
 
-    /**
-     * @param AdminInterface $admin
-     * @param ProxyQueryInterface|QueryBuilder $query
-     */
     public function configureQuery(AdminInterface $admin, ProxyQueryInterface $query): void
     {
+        /** @var EntityAssignedUsersInterface $entityClass */
         $entityClass = $admin->getClass();
 
         // Skip if current entity class does not implement interface OR user is super admin

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
@@ -7,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Inject our own @see EntityRouterBuilder into admins that have trash enabled so the corresponding routes will be added.
+ */
 class AddRouteBuilderCompilerPass implements CompilerPassInterface
 {
     /**

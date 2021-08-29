@@ -1,34 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 17:14
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Transformer;
 
 /**
- * Class GenderTransformer
- * TODO: Use translatable strings and contstants from UserBundle -> move to UserBundle.
- *
- * @package Marlinc\AdminBundle\Transformer
+ * TODO: Use translatable strings and constants from UserBundle -> move to UserBundle.
  */
 class GenderTransformer implements TransformerInterface
 {
-    private $genders = [
+    private array $genders = [
         'u' => '',
         'm' => 'Herr',
         'f' => 'Frau'
     ];
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return mixed
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $key => $value) {
             $data[$key] = $this->genders[$value];

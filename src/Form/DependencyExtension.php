@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 03.08.18
- * Time: 13:32
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Form;
 
@@ -19,16 +15,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Show/hide a form field depending on the value of another form field.
+ */
 class DependencyExtension extends AbstractTypeExtension
 {
-    /**
-     * @inheritDoc
-     */
-    public function getExtendedType()
-    {
-        return FormType::class;
-    }
-
     /**
      * @inheritDoc
      */
@@ -47,6 +38,7 @@ class DependencyExtension extends AbstractTypeExtension
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['depending-on'] !== null && $form->getParent()->has($options['depending-on'])) {
+            $dependentId = null;
             $dependentOn = $form->getParent()->get($options['depending-on']);
             $dependentOnClass = get_class($dependentOn->getConfig()->getType()->getInnerType());
             $attributes = [];
@@ -77,7 +69,7 @@ class DependencyExtension extends AbstractTypeExtension
                     break;
             }
 
-            if (isset($attributes['data-type'])) {
+            if (isset($attributes['data-type']) && $dependentId !== null) {
                 $attributes['data-source'] = '#'.$dependentId;
                 $attributes['data-value'] = (string) $options['depending-value'];
                 $attributes['data-comparison'] = $options['depending-comparison'];

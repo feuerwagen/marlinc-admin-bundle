@@ -11,47 +11,23 @@
 
 namespace Marlinc\AdminBundle\Model;
 
-use Doctrine\ORM\EntityManager;
-use Gedmo\Loggable\LoggableListener;
-use Gedmo\SoftDeleteable\SoftDeleteableListener;
-use Sonata\AdminBundle\Model\AuditReaderInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * Class TrashReader
- *
- * @author Romain Honel <romain.honel@gmail.com>
- */
 class TrashReader implements TrashReaderInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /**
-     * @var SoftDeleteableListener
-     */
-    private $softDeleteable;
-
-    /**
-     * TrashReader constructor.
-     *
-     * @param EntityManager $em
-     * @param SoftDeleteableListener $softDeleteable
-     */
-    public function __construct(EntityManager $em, SoftDeleteableListener $softDeleteable)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
-        $this->softDeleteable = $softDeleteable;
     }
 
     /**
-     * @param mixed $object
+     * @inheritdoc
      */
-    public function restore($object)
+    public function restore($object): void
     {
         $object->setDeletedAt(null);
-        $this->em->persist($object);
         $this->em->flush();
     }
 }

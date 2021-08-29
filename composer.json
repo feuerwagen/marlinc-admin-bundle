@@ -15,6 +15,7 @@
   }],
   "require": {
     "php": ">=7.4",
+    "ext-pdo": "*",
     "doctrine/dbal": "^2.12",
     "doctrine/orm": "^2.8",
     "fresh/doctrine-enum-bundle": "^7.1",

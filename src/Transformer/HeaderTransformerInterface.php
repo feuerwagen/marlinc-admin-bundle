@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 12.07.17
- * Time: 10:10
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
@@ -13,16 +8,7 @@ use Marlinc\AdminBundle\Export\ExportHeader;
 
 interface HeaderTransformerInterface extends TransformerInterface
 {
-    /**
-     * @param string $name
-     * @return ExportHeader
-     */
-    public function getHeader(string $name);
+    public function getHeader(string $name): ExportHeader;
 
-    /**
-     * @param string $font
-     * @param string $color
-     * @return HeaderTransformerInterface
-     */
-    public function setHeaderStyle(string $font, string $color);
+    public function setHeaderStyle(string $font, string $color): HeaderTransformerInterface;
 }

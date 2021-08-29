@@ -1,38 +1,38 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 17:14
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
+use Marlinc\AdminBundle\Export\ExportColumn;
+
+/**
+ * TODO: Rename to ReadableLabelTransformer
+ */
 class EnumTransformer implements TransformerInterface
 {
-    private $choices;
-
     /**
-     * EnumTransformer constructor.
-     * @param $choices
+     * @var array A map of value/name pairs.
      */
-    public function __construct($choices)
+    private array $choices;
+
+    public function __construct(array $choices)
     {
         $this->choices = $choices;
     }
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return mixed
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $key => $value) {
-            $data[$key] = $this->choices[$value];
+            $data[$key] = (array_key_exists($value, $this->choices)) ? $this->choices[$value] : $value;
         }
 
-        return [$name => implode('', $data)];
+        if ($type == ExportColumn::TYPE_SINGLE) {
+            return [$name => implode(', ', $data)];
+        }
+
+        return $data;
     }
 }

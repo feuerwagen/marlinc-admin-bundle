@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Route;
 
@@ -9,6 +10,10 @@ use Sonata\AdminBundle\Builder\RouteBuilderInterface;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Route\PathInfoBuilder;
 
+/**
+ * Add trash and revert routes to the default Sonata admin routes.
+ * @see PathInfoBuilder
+ */
 class EntityRouterBuilder  implements RouteBuilderInterface
 {
     private PathInfoBuilder $decorated;

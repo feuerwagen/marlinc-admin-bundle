@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Sonata Project package.
- *
- * (c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Marlinc\AdminBundle\Generator;
 
 use Symfony\Bundle\MakerBundle\Generator;
@@ -16,8 +7,7 @@ use Sonata\AdminBundle\Model\ModelManagerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
- * @author Marek Stipek <mario.dweller@seznam.cz>
- * @author Simon Cosandey <simon.cosandey@simseo.ch>
+ * TODO: Replace with a maker command
  */
 class AdminGenerator extends Generator
 {

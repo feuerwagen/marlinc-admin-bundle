@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 23.07.18
- * Time: 11:13
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Guesser;
 
@@ -15,10 +10,14 @@ use Sonata\AdminBundle\FieldDescription\TypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+/**
+ * Guess proper list field type for fields based on @see AbstractEnumType.
+ * TODO Make dependency on DoctrineEnumBundle optional.
+ */
 class EnumTypeGuesser implements TypeGuesserInterface
 {
     /**
-     * @var array Array of registered doctrine types
+     * Registered doctrine types
      */
     protected array $registeredTypes = [];
 
@@ -38,23 +37,23 @@ class EnumTypeGuesser implements TypeGuesserInterface
             return null;
         }
 
-        $registeredEnumTypeFQCN = $this->registeredTypes[$fieldType];
+        $registeredTypeFQCN = $this->registeredTypes[$fieldType];
 
-        if (!\class_exists($registeredEnumTypeFQCN)) {
+        if (!\class_exists($registeredTypeFQCN)) {
             throw new EnumTypeIsRegisteredButClassDoesNotExistException(\sprintf(
-                'ENUM type "%s" is registered as "%s", but that class does not exist',
+                'Doctrine type "%s" is registered as "%s", but that class does not exist',
                 $fieldType,
-                $registeredEnumTypeFQCN
+                $registeredTypeFQCN
             ));
         }
 
-        if (!\is_subclass_of($registeredEnumTypeFQCN, AbstractEnumType::class)) {
+        if (!\is_subclass_of($registeredTypeFQCN, AbstractEnumType::class)) {
             return null;
         }
 
         // Get the choices from the fully qualified class name
         return new TypeGuess('choice', [
-            'choices' => $registeredEnumTypeFQCN::getReadableValues()
+            'choices' => $registeredTypeFQCN::getReadableValues()
         ], Guess::VERY_HIGH_CONFIDENCE);
     }
 }

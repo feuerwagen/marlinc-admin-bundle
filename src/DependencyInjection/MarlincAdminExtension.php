@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 14:17
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\DependencyInjection;
 

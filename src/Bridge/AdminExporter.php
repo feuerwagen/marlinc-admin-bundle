@@ -1,31 +1,29 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 30.06.17
- * Time: 15:34
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Bridge;
 
 use Marlinc\AdminBundle\Export\ExportFormat;
+use Marlinc\AdminBundle\Writer\ComplexWriterInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
-use Sonata\Exporter\Exporter;
 use Sonata\Exporter\Source\SourceIteratorInterface;
 use Sonata\Exporter\Writer\TypedWriterInterface;
+use Sonata\Exporter\Writer\WriterInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AdminExporter
 {
     /**
-     * @var ExportFormat[]
+     * The available export formats, keyed by the entity class name they apply to and then their name.
+     *
+     * @var array<string,array<string,ExportFormat>>
      */
-    private $formats;
+    private array $formats;
 
     /**
      * @var TypedWriterInterface[]
      */
-    private $writers;
+    private array $writers;
 
     public function __construct(array $writers = [])
     {
@@ -38,19 +36,19 @@ final class AdminExporter
     }
 
     /**
-     * The main benefit of this method is the type hinting.
+     * Register a new export format.
      *
-     * @param ExportFormat $format a possible format for exporting data
+     * @param ExportFormat $format A possible format for exporting data.
+     * @param string $name The name of the format (used as a translation key).
+     * @param string $class The fully qualified class name of the entity the format applies to.
      */
-    public function addFormat(ExportFormat $format, $name, $class)
+    public function addFormat(ExportFormat $format, string $name, string $class)
     {
         $this->formats[$class][$name] = $format;
     }
 
     /**
-     * The main benefit of this method is the type hinting.
-     *
-     * @param TypedWriterInterface $writer a possible writer for exporting data
+     * Register a new writer for exporting data.
      */
     public function addWriter(TypedWriterInterface $writer)
     {
@@ -61,9 +59,9 @@ final class AdminExporter
      * Queries an admin for its default export formats, and falls back on global settings.
      *
      * @param AdminInterface $admin the current admin object
-     * @return ExportFormat[] an array of formats
+     * @return string[] an array of format identifiers
      */
-    public function getAvailableFormats(AdminInterface $admin)
+    public function getAvailableFormats(AdminInterface $admin): array
     {
         $class = $admin->getClass();
 
@@ -75,11 +73,11 @@ final class AdminExporter
     }
 
     /**
-     * Returns a simple array of export formats.
+     * Returns an array of available export file types.
      *
      * @return string[] writer formats as returned by the TypedWriterInterface::getFormat() method
      */
-    public function getAvailableFileTypes()
+    public function getAvailableFileTypes(): array
     {
         return array_keys($this->writers);
     }
@@ -91,21 +89,25 @@ final class AdminExporter
      * @param AdminInterface $admin the current admin object
      * @param ExportFormat $format the format of the export file
      * @param string $filetype the requested file type
-     * @return string
+     *
+     * @return string The generated filename
      * @throws \RuntimeException If the export file format is invalid
      */
-    public function getExportFilename(AdminInterface $admin, ExportFormat $format, $filetype)
+    public function getExportFilename(AdminInterface $admin, ExportFormat $format, string $filetype): string
     {
         return $format->getFilename($admin, $filetype);
     }
 
     /**
-     * @param AdminInterface $admin
-     * @param string $format
-     * @return ExportFormat|null
+     * Get the real export format from its name.
+     *
+     * @param AdminInterface $admin The admin class handling the current entity to be exported.
+     * @param string $format The name of the export format.
+     *
      * @throws \RuntimeException If the export format is invalid
      */
-    public function getExportFormat(AdminInterface $admin, $format) {
+    public function getExportFormat(AdminInterface $admin, string $format): ExportFormat
+    {
         $class = $admin->getClass();
 
         if (array_key_exists($class, $this->formats) && array_key_exists($format, $this->formats[$class])) {
@@ -122,16 +124,9 @@ final class AdminExporter
     }
 
     /**
-     * @throws \RuntimeException
-     *
-     * @param string $filetype
-     * @param string $filename
-     * @param ExportFormat $format
-     * @param SourceIteratorInterface $source
-     *
-     * @return StreamedResponse
+     * Generate the response (streamed file) for the requested export.
      */
-    public function getResponse($filetype, $filename, ExportFormat $format, SourceIteratorInterface $source)
+    public function getResponse(string $filetype, string $filename, ExportFormat $format, SourceIteratorInterface $source): StreamedResponse
     {
         if (!array_key_exists($filetype, $this->writers)) {
             throw new \RuntimeException(sprintf(
@@ -147,11 +142,10 @@ final class AdminExporter
             $handler->export();
         };
 
-        $headers = array(
+        $headers = [
             'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
-        );
-
-        $headers['Content-Type'] = $writer->getDefaultMimeType();
+            'Content-Type' => $writer->getDefaultMimeType()
+        ];
 
         return new StreamedResponse($callback, 200, $headers);
     }

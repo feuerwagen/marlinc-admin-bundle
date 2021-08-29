@@ -1,48 +1,28 @@
 <?php
+declare(strict_types=1);
 
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace Marlinc\AdminBundle\Model;
 
-/**
- * Interface TrashManagerInterface
- *
- * @author Picoss <romain.honel@gmail.com>
- */
 interface TrashManagerInterface
 {
     /**
-     * Set TrashReaderInterface service id for array of $classes.
+     * Set TrashReaderInterface service id responsible for an array of $classes.
      *
-     * @param string $serviceId
-     * @param array  $classes
+     * @param string        $serviceId
+     * @param array<string> $classes
      */
-    public function setReader($serviceId, array $classes);
+    public function setReader(string $serviceId, array $classes): self;
 
     /**
-     * Returns true if $class has TrashReaderInterface.
-     *
-     * @param string $class
-     *
-     * @return bool
+     * Returns true if $class has TrashReaderInterface instance assigned.
      */
-    public function hasReader($class);
+    public function hasReader(string $class): bool;
 
     /**
      * Get TrashReaderInterface service for $class.
      *
-     * @param string $class
-     *
-     * @return \Marlinc\SonataExtraAdminBundle\Model\TrashReaderInterface
-     *
-     * @throws \RuntimeException
+     * @throws \RuntimeException If no reader is available
      */
-    public function getReader($class);
+    public function getReader(string $class): TrashReaderInterface;
 }

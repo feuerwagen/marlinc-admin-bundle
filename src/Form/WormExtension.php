@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 02.08.18
- * Time: 16:19
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Form;
 
@@ -17,16 +12,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Disable a form field once data has been saved.
+ */
 class WormExtension extends AbstractTypeExtension
 {
-    /**
-     * @inheritDoc
-     */
-    public function getExtendedType()
-    {
-        return FormType::class;
-    }
-
     /**
      * @inheritDoc
      */
@@ -37,10 +27,6 @@ class WormExtension extends AbstractTypeExtension
                 $data = $event->getData();
                 $form = $event->getForm();
                 $parent = $form->getParent();
-
-                // check if the object is "new"
-                // If you didn't pass any data to the form, the data is "null".
-                // This should be considered a new object
 
                 if ($data instanceof Collection) {
                     if (!$data->isEmpty()) {
@@ -57,7 +43,7 @@ class WormExtension extends AbstractTypeExtension
     {
         $options = $form->getConfig()->getOptions();
 
-        // Prevent infinte loop.
+        // Prevent infinite loop.
         if (isset($options['disabled']) && $options['disabled'] == true) {
             return;
         }
@@ -75,7 +61,7 @@ class WormExtension extends AbstractTypeExtension
     }
 
     /**
-     * Return the class of the type being extended.
+     * @inheritdoc
      */
     public static function getExtendedTypes(): iterable
     {

@@ -1,41 +1,20 @@
 <?php
 
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Marlinc\AdminBundle\Model;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class TrashManager
- *
- * @author Romain Honel <romain.honel@gmail.com>
- */
 class TrashManager implements TrashManagerInterface
 {
     /**
-     * @var array
+     * @var array<string, string> Map service ID to FQCN
      */
-    protected $classes = [];
+    protected array $readers = [];
+
+    protected ContainerInterface $container;
 
     /**
-     * @var array
-     */
-    protected $readers = [];
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
+     * TODO: Don't rely on the container - use DI instead.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -46,15 +25,17 @@ class TrashManager implements TrashManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function setReader($serviceId, array $classes)
+    public function setReader(string $serviceId, array $classes): self
     {
         $this->readers[$serviceId] = $classes;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasReader($class)
+    public function hasReader(string $class): bool
     {
         foreach ($this->readers as $classes) {
             if (in_array($class, $classes)) {
@@ -68,7 +49,7 @@ class TrashManager implements TrashManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getReader($class)
+    public function getReader(string $class): TrashReaderInterface
     {
         foreach ($this->readers as $readerId => $classes) {
             if (in_array($class, $classes)) {
@@ -76,6 +57,6 @@ class TrashManager implements TrashManagerInterface
             }
         }
 
-        throw new \RuntimeException(sprintf('The class "%s" does not have any reader manager', $class));
+        throw new \RuntimeException(sprintf('The class "%s" does not have any trash reader.', $class));
     }
 }

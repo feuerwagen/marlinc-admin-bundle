@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 19.04.18
- * Time: 09:35
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Security;
 
@@ -17,52 +12,43 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Vote on access restrictions to entities based on their relation to the current user.
+ * @see EntityAssignedUsersInterface
+ */
 class AssignedUserVoter extends Voter
 {
     /**
      * @var string[]
      */
-    private $attributes;
+    private array $attributes;
 
     /**
-     * @var AccessDecisionManagerInterface
+     * @var string[]
      */
-    private $decisionManager;
+    private array $superAdminRoles;
 
-    /**
-     * @var Pool
-     */
-    private $adminPool;
+    private AccessDecisionManagerInterface $decisionManager;
 
-    /**
-     * @var SecurityHandlerInterface
-     */
-    private $securityHandler;
+    private Pool $adminPool;
 
-    /**
-     * AssignedUserVoter constructor.
-     *
-     * @param AccessDecisionManagerInterface $decisionManager
-     * @param SecurityHandlerInterface $securityHandler
-     * @param Pool $adminPool
-     */
-    public function __construct(AccessDecisionManagerInterface $decisionManager, SecurityHandlerInterface $securityHandler, Pool $adminPool)
+    private SecurityHandlerInterface $securityHandler;
+
+    public function __construct(AccessDecisionManagerInterface $decisionManager, SecurityHandlerInterface $securityHandler, Pool $adminPool, array $superAdminRoles)
     {
         $this->decisionManager = $decisionManager;
         $this->securityHandler = $securityHandler;
         $this->adminPool = $adminPool;
-        $this->attributes = [
+        $this->attributes = [ // TODO: Replace with constants / list provided by SonataAdminBundle?
             'VIEW',
             'EDIT',
+            'HISTORY',
             'DELETE'
         ];
+        $this->superAdminRoles = $superAdminRoles;
     }
 
-    /**
-     * @param string $attribute
-     * @return AssignedUserVoter
-     */
-    public function addAttribute(string $attribute): AssignedUserVoter
+    public function addAttribute(string $attribute): self
     {
         $this->attributes[] = $attribute;
         return $this;
@@ -71,7 +57,7 @@ class AssignedUserVoter extends Voter
     /**
      * @inheritDoc
      */
-    protected function supports($attribute, $subject)
+    protected function supports(string $attribute, $subject): bool
     {
         // Vote only on entities with assigned users.
         if (!$subject instanceof EntityAssignedUsersInterface) {
@@ -84,20 +70,19 @@ class AssignedUserVoter extends Voter
         }
 
         $role = $this->securityHandler->getBaseRole($admin);
-        $roles = [];
-
-        foreach ($this->attributes as $attr) {
-            $roles[] = sprintf($role, $attr);
-        }
+        $roles = array_map(function ($attr) use ($role) {
+            return sprintf($role, $attr);
+        }, $this->attributes);
 
         return in_array($attribute, $roles);
     }
 
     /**
      * @inheritDoc
+     *
      * @param EntityAssignedUsersInterface $subject
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
@@ -107,13 +92,17 @@ class AssignedUserVoter extends Voter
         }
 
         // Skip for super admin.
-        if ($this->decisionManager->decide($token, ['ROLE_SUPER_ADMIN'])) {
-            return true;
+        foreach ($this->superAdminRoles as $role) {
+            if ($this->decisionManager->decide($token, [$role])) {
+                return true;
+            }
         }
 
-        // Check if user has Sonata role matching the attribute + user is assigned to the entity
+        // Check if user has role matching the attribute + user is assigned to the entity
         if ($this->decisionManager->decide($token, [$attribute]) && $subject->hasUser($user)) {
             return true;
         }
+
+        return false;
     }
 }

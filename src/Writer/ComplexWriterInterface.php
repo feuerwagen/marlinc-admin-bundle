@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 14:30
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Writer;
 
@@ -19,9 +14,20 @@ interface ComplexWriterInterface extends TypedWriterInterface
     const FORMAT_LINK = 4;
     const FORMAT_EMAIL = 5;
 
-    public function writeHeaders(array $header);
+    /**
+     * Write the header rows to the spreadsheet.
+     */
+    public function writeHeaders(array $header): void;
 
-    public function setColumnsType(array $formats);
+    /**
+     * Set the column types for the whole spreadsheet.
+     *
+     * @param string|array<string,string> $types
+     */
+    public function setColumnsType(array $types): self;
 
-    public function getColumnType($column);
+    /**
+     * Determine the fitting column type.
+     */
+    public function getColumnType(string $column): ?string;
 }

@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 06.12.17
- * Time: 14:23
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Export;
 
@@ -15,6 +10,11 @@ use Sonata\Exporter\Source\SourceIteratorInterface;
 
 interface ExportFormatInterface
 {
+    /**
+     * Add a column to the export format. Each column must have
+     * - a name (used as a header)
+     * - a type (defining how the column will be rendered)
+     */
     public function addColumn(string $name, int $type, TransformerInterface $transformer = null, array $fields = [''], ExportHeader $header = null, int $format = null): self;
 
     public function getFiletype(): string;

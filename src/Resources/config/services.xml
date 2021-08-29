@@ -22,6 +22,9 @@
             <argument type="service" id="Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface" />
             <argument type="service" id="sonata.admin.security.handler.role" />
             <argument type="service" id="sonata.admin.pool" />
+            <argument type="collection">
+                <argument>%sonata.admin.configuration.security.role_super_admin%</argument>
+            </argument>
         </service>
         <service id="Marlinc\AdminBundle\Route\EntityRouterBuilder">
             <argument type="service" id="sonata.admin.route.path_info"/>
@@ -42,7 +45,7 @@
         <service id="Marlinc\AdminBundle\Form\DependencyExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
-        <service id="Marlinc\AdminBundle\Admin\BatchActionsExtention" public="true">
+        <service id="Marlinc\AdminBundle\Admin\BatchActionsExtension" public="true">
             <tag name="sonata.admin.extension" global="true" />
         </service>
         <service id="marlinc.admin.twig.extension.stringloader" class="Twig\Extension\StringLoaderExtension">
@@ -50,11 +53,6 @@
         </service>
         <service id="marlinc.admin.trash.manager" class="Marlinc\AdminBundle\Model\TrashManager">
             <argument type="service" id="service_container" />
-        </service>
-        <service id="marlinc.admin.route.entity" class="Marlinc\AdminBundle\Route\AddManagerRoutesBuilder">
-            <argument type="service" id="sonata.admin.route.path_info"/>
-            <argument type="service" id="sonata.admin.audit.manager"/>
-            <argument type="service" id="marlinc.admin.trash.manager"/>
         </service>
     </services>
 </container>

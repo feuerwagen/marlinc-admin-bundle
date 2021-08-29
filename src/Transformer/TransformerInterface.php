@@ -1,21 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 16:32
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Transformer;
 
 
 interface TransformerInterface
 {
-    /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return array
-     */
-    public function transform(string $name, int $type, array $data);
+    public function transform(string $name, int $type, array $data): array;
 }

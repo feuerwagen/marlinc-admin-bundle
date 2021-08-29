@@ -1,17 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 12.07.17
- * Time: 11:38
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
 
 abstract class AbstractHeaderTransformer implements HeaderTransformerInterface
 {
-    protected $style = [
+    protected array $style = [
         'color' => null,
         'font' => 'b'
     ];
@@ -19,7 +14,7 @@ abstract class AbstractHeaderTransformer implements HeaderTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function setHeaderStyle(string $font, string $color)
+    public function setHeaderStyle(string $font, string $color): self
     {
         $this->style = [
             'font' => $font,

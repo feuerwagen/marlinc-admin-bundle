@@ -1,15 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 14:16
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle;
 
 
+use Marlinc\AdminBundle\DependencyInjection\Compiler\AddAuditEntityCompilerPass;
 use Marlinc\AdminBundle\DependencyInjection\Compiler\AddRouteBuilderCompilerPass;
+use Marlinc\AdminBundle\DependencyInjection\Compiler\AddTrashEntityCompilerPass;
 use Marlinc\AdminBundle\DependencyInjection\Compiler\AdminExporterCompilerPass;
 use Marlinc\AdminBundle\DependencyInjection\Compiler\SonataTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,5 +22,7 @@ class MarlincAdminBundle extends Bundle
         $container->addCompilerPass(new AdminExporterCompilerPass());
         $container->addCompilerPass(new SonataTemplatesPass());
         $container->addCompilerPass(new AddRouteBuilderCompilerPass());
+        $container->addCompilerPass(new AddTrashEntityCompilerPass());
+        $container->addCompilerPass(new AddAuditEntityCompilerPass());
     }
 }

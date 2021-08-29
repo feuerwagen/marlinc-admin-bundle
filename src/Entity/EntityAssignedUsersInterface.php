@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 19.04.18
- * Time: 09:28
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Entity;
 
@@ -16,47 +11,35 @@ interface EntityAssignedUsersInterface
     /**
      * Return an array of field names leading to the parent entity which holds the user association.
      * If not applicable, return null.
-     *
-     * @return array|null
      */
     public static function getParents(): ?array;
 
     /**
      * Get all assigned users.
      *
-     * @return Collection
+     * @return Collection<UserInterface>
      */
     public function getUsers(): Collection;
 
     /**
      * Set all assigned users.
      *
-     * @param Collection $users
-     * @return self
+     * @param Collection<UserInterface> $users
      */
-    public function setUsers(Collection $users);
+    public function setUsers(Collection $users): self;
 
     /**
      * Add an assigned user.
-     *
-     * @param UserInterface $user
-     * @return self
      */
-    public function addUser(UserInterface $user);
+    public function addUser(UserInterface $user): self;
 
     /**
      * Remove an assigned user.
-     *
-     * @param UserInterface $user
-     * @return self
      */
-    public function removeUser(UserInterface $user);
+    public function removeUser(UserInterface $user): self;
 
     /**
      * Check if the given user is assigned to this entity (or a parent entity).
-     *
-     * @param UserInterface $user
-     * @return bool
      */
     public function hasUser(UserInterface $user): bool;
 }

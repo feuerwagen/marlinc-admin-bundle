@@ -1,69 +1,36 @@
 <?php
-
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Loggable\Entity\LogEntry;
 use Gedmo\Loggable\LoggableListener;
 use Sonata\AdminBundle\Model\AuditReaderInterface;
 
-/**
- * Class AuditReader
- *
- * @author Romain Honel <romain.honel@gmail.com>
- */
 class AuditReader implements AuditReaderInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /**
-     * @var LoggableListener
-     */
-    private $loggable;
+    private LoggableListener $loggable;
 
-    /**
-     * AuditReader constructor.
-     *
-     * @param EntityManager $em
-     * @param LoggableListener $loggable
-     */
-    public function __construct(EntityManager $em, LoggableListener $loggable)
+    public function __construct(EntityManagerInterface $em, LoggableListener $loggable)
     {
         $this->em = $em;
         $this->loggable = $loggable;
     }
 
-    /**
-     * @param $className
-     *
-     * @return string
-     */
-    private function getObjectLogEntryClass($className)
+    private function getLogEntryClassName(string $className): string
     {
         $configuration = $this->loggable->getConfiguration($this->em, $className);
 
-        return isset($configuration['logEntryClass'])?:'Gedmo\Loggable\Entity\LogEntry';
+        return $configuration['logEntryClass'] ?? LogEntry::class;
     }
 
     /**
-     * @param string $className
-     * @param string $id
-     * @param string $revision
-     *
-     * @return mixed
+     * @inheritdoc
      */
-    public function find($className, $id, $revision)
+    public function find(string $className, $id, $revision): ?object
     {
 
         $configuration = $this->loggable->getConfiguration($this->em, $className);
@@ -71,7 +38,7 @@ class AuditReader implements AuditReaderInterface
         $object = $this->em->find($className, $id);
 
         if ($configuration['loggable'] == true) {
-            $repo = $this->em->getRepository($this->getObjectLogEntryClass($className));
+            $repo = $this->em->getRepository($this->getLogEntryClassName($className));
             $repo->revert($object, $revision);
         }
 
@@ -79,62 +46,49 @@ class AuditReader implements AuditReaderInterface
     }
 
     /**
-     * @param string $className
-     * @param int    $limit
-     * @param int    $offset
+     * @inheritdoc
      */
-    public function findRevisionHistory($className, $limit = 20, $offset = 0)
+    public function findRevisionHistory(string $className,  int $limit = 20, int $offset = 0): array
     {
-        $repo = $this->em->getRepository($className);
-    }
-
-    /**
-     * @param string $classname
-     * @param string $revision
-     *
-     * @return [];
-     */
-    public function findRevision($classname, $revision)
-    {
+        // TODO implement
         return [];
     }
 
     /**
-     * @param string $className
-     * @param string $id
-     *
-     * @return mixed
+     * @inheritdoc
      */
-    public function findRevisions($className, $id)
+    public function findRevision(string $className, $revisionId): ?object
     {
-        $repo = $this->em->getRepository($this->getObjectLogEntryClass($className));
+        // TODO implement
+        return null;
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function findRevisions(string $className, $id): array
+    {
+        $repo = $this->em->getRepository($this->getLogEntryClassName($className));
         $object = $this->em->find($className, $id);
 
         return $repo->getLogEntries($object);
     }
 
-    /**
-     * @param mixed $object
-     * @param int   $revision
-     */
-    public function revert($object, $revision)
+    public function revert($object, int $revision)
     {
-        $repo = $this->em->getRepository($this->getObjectLogEntryClass(get_class($object)));
+        // TODO: Method not used?
+        $repo = $this->em->getRepository($this->getLogEntryClassName(get_class($object)));
         $repo->revert($object, $revision);
-        $this->em->persist($object);
         $this->em->flush();
     }
 
     /**
-     * @param string $className
-     * @param int $id
-     * @param int $oldRevision
-     * @param int $newRevision
+     * @inheritdoc
      */
-    public function diff($className, $id, $oldRevision, $newRevision)
+    public function diff($className, $id, $oldRevisionId, $newRevisionId): array
     {
         // TODO: Implement diff() method.
+        return [];
     }
 
 }

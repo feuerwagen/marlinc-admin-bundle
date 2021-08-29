@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 17:24
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
@@ -14,31 +9,21 @@ use Marlinc\AdminBundle\Export\ExportHeader;
 
 abstract class AbstractCollectionTransformer extends AbstractHeaderTransformer
 {
-    /**
-     * @var \Traversable|null
-     */
-    protected $collection;
+    protected ?iterable $collection = null;
 
-    /**
-     * AbstractCollectionTransformer constructor.
-     * @param $collection
-     */
-    public function __construct($collection = null)
+    public function __construct(iterable $collection = null)
     {
-        if (is_array($collection)) {
-            $collection = new ArrayCollection($collection);
-        }
-        $this->collection = $collection;
+        $this->collection = (is_array($collection)) ? new ArrayCollection($collection) : $collection;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getHeader(string $name)
+    public function getHeader(string $name): ExportHeader
     {
         $header = new ExportHeader();
 
-        if (($this->collection instanceof \Traversable || is_array($this->collection)) && count($this->collection) > 0) {
+        if ($this->collection !== null && count($this->collection) > 0) {
             $header->addGroupField($name, $this->style['color'], $this->style['font']);
 
             foreach ($this->collection as $item) {
@@ -50,12 +35,9 @@ abstract class AbstractCollectionTransformer extends AbstractHeaderTransformer
     }
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return mixed
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         $values = [];
 
@@ -70,8 +52,8 @@ abstract class AbstractCollectionTransformer extends AbstractHeaderTransformer
                 $values[$label] = '';
             }
 
-            foreach ($data as $key => $value) {
-                if ($value instanceof \Traversable) {
+            foreach ($data as $value) {
+                if (is_iterable($value)) {
                     foreach ($value as $entity) {
                         if ($entity == $item) {
                             $values[$label] = $this->getDataValue($entity);
@@ -89,25 +71,19 @@ abstract class AbstractCollectionTransformer extends AbstractHeaderTransformer
      * This method needs to be implemented, if the collection is not already given in the constructor.
      *
      * @param array $data The available object properties
-     * @return \Traversable
      */
-    protected function loadCollection(array $data) {
-        throw new \RuntimeException();
+    protected function loadCollection(array $data): iterable
+    {
+        throw new \RuntimeException("Transformer needs to implement loadCollection().");
     }
 
     /**
      * Get the value with which to fill the data cell, if the collection value is present in the current dataset.
-     *
-     * @param $entity
-     * @return string
      */
-    abstract protected function getDataValue($entity);
+    abstract protected function getDataValue(object $entity): string;
 
     /**
      * Get the label for the column representing an item in the collection.
-     *
-     * @param $collectionItem
-     * @return string
      */
-    abstract protected function getLabelValue($collectionItem);
+    abstract protected function getLabelValue($collectionItem): string;
 }

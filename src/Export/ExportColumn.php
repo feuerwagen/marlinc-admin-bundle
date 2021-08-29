@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 14:59
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Export;
 
@@ -16,55 +12,56 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ExportColumn
 {
+    /**
+     * Column is a fixed single value (independent of any fields).
+     */
     const TYPE_FIXED = 0;
+
+    /**
+     * Column is a single value (depending on the values of the fields).
+     */
     const TYPE_SINGLE = 1;
+
+    /**
+     * Column is split into multiple sub-columns (with values depending on the values of the fields).
+     */
     const TYPE_MULTIPLE = 2;
 
     /**
-     * @var string
+     * Name of the column for the header row in the export.
      */
-    protected $name;
+    protected string $name;
 
     /**
-     * @var int
+     * Column type
+     * @see TYPE_FIXED
+     * @see TYPE_SINGLE
+     * @see TYPE_MULTIPLE
      */
-    protected $type;
+    protected int $type;
 
     /**
-     * @var array
+     * An array of property paths to include into this column.
+     * @var string[]
      */
-    protected $fields;
+    protected array $fields;
 
     /**
-     * @var TransformerInterface|null
+     * Will be applied to the raw field values, if given. @see TransformerInterface
      */
-    protected $transformer;
+    protected ?TransformerInterface $transformer;
 
     /**
-     * @var ExportHeader|null
+     * Defines the style of the header row for this column, if given. If not given, a standard header based on @see $name
+     * will be generated.
      */
-    protected $header;
+    protected ?ExportHeader $header;
 
-    /**
-     * @var int
-     */
-    protected $format;
+    protected int $format;
 
-    /**
-     * @var array
-     */
-    protected $effectiveColumns = null;
+    protected ?array $effectiveColumns = null;
 
-    /**
-     * Column constructor.
-     * @param string $name
-     * @param int $type
-     * @param TransformerInterface|null $transformer
-     * @param array $fields
-     * @param ExportHeader|null $header
-     * @param int $format
-     */
-    public function __construct(string $name, int $type, TransformerInterface $transformer = null, $fields = [], ExportHeader $header = null, $format = null)
+    public function __construct(string $name, int $type, TransformerInterface $transformer = null, array $fields = [], ExportHeader $header = null, ?int $format = null)
     {
         $this->name = $name;
         $this->type = $type;
@@ -74,41 +71,26 @@ class ExportColumn
         $this->format = $format;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return int
-     */
     public function getType(): int
     {
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
     public function getFields(): array
     {
         return $this->fields;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getFormat()
+    public function getFormat(): ?int
     {
         return $this->format;
     }
 
-    /**
-     * @return ExportHeader
-     */
     public function getHeader(): ExportHeader
     {
         if ($this->header instanceof ExportHeader) {
@@ -129,13 +111,7 @@ class ExportColumn
         return ExportHeader::createSimpleHeader($this->name);
     }
 
-    /**
-     * @param $data
-     * @param PropertyAccessor $accessor
-     * @param array $paths
-     * @return array
-     */
-    public function transform($data, PropertyAccessor $accessor, array $paths)
+    public function transform($data, PropertyAccessor $accessor, array $paths): array
     {
         $values = [];
         $result = [$this->name => $this->fields[0]];
@@ -148,7 +124,7 @@ class ExportColumn
                 try {
                     $values[$field] = $accessor->getValue($data, $paths[$field]);
                 } catch (UnexpectedTypeException $e) {
-                    // non existent object in path will be ignored
+                    // nonexistent object in path will be ignored
                     $values[$field] = null;
                 }
             }
@@ -167,7 +143,7 @@ class ExportColumn
                     $result = [$this->name => (string) $value];
                 }
             } catch (UnexpectedTypeException $e) {
-                // non existent object in path will be ignored
+                // nonexistent object in path will be ignored
                 $result = [$this->name => null];
             }
         } elseif ($this->type == self::TYPE_MULTIPLE) {
@@ -176,7 +152,7 @@ class ExportColumn
                 try {
                     $result[$field] = $accessor->getValue($data, $paths[$field]);
                 } catch (UnexpectedTypeException $e) {
-                    // non existent object in path will be ignored
+                    // nonexistent object in path will be ignored
                     $result[$field] = null;
                 }
             }
@@ -190,9 +166,9 @@ class ExportColumn
     }
 
     /**
-     * @return array
+     * @return array<mixed, int>
      */
-    public function getTypes()
+    public function getTypes(): array
     {
         $types = [];
 

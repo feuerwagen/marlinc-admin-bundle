@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 17.03.17
- * Time: 16:51
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Writer;
 
@@ -20,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class XmlExcelWriter implements ComplexWriterInterface
 {
-    static $typeMap = [
+    static array $typeMap = [
         ComplexWriterInterface::FORMAT_STRING => DataType::TYPE_STRING,
         ComplexWriterInterface::FORMAT_NUMBER => DataType::TYPE_NUMERIC,
         ComplexWriterInterface::FORMAT_DATE => null,
@@ -29,10 +25,7 @@ class XmlExcelWriter implements ComplexWriterInterface
         ComplexWriterInterface::FORMAT_EMAIL => DataType::TYPE_STRING
     ];
 
-    /**
-     * @var string|null
-     */
-    protected $filename = null;
+    protected string $filename;
 
     /**
      * @var resource|null
@@ -42,43 +35,25 @@ class XmlExcelWriter implements ComplexWriterInterface
     /**
      * @var bool
      */
-    protected $showHeaders;
+    protected bool $showHeaders;
 
     /**
-     * @var mixed|null
+     * @var string|array<string,string>|null Define cells type to use
+     *           If string: force all cells to the given type. e.g: 'Number'
+     *           If array: force only given cells. e.g: array('ean'=>'String', 'price'=>'Number')
+     *           If null: will guess the type. 'Number' if value is numeric, 'String' otherwise
      */
     protected $columnsType = null;
 
-    /**
-     * @var int
-     */
-    protected $position = 1;
+    protected int $position = 1;
 
-    /**
-     * @var string
-     */
-    protected $singleHeaders = 'A1';
+    protected string $singleHeaders = 'A1';
 
-    /**
-     * @var Spreadsheet
-     */
-    private $spreadsheet;
+    private ?Spreadsheet $spreadsheet = null;
 
-    /**
-     * @var PhpSpreadsheetFactory
-     */
-    private $factory;
+    private PhpSpreadsheetFactory $factory;
 
-    /**
-     * @param PhpSpreadsheetFactory $factory
-     * @param string $filename
-     * @param bool $showHeaders
-     * @param mixed $columnsType Define cells type to use
-     *                            If string: force all cells to the given type. e.g: 'Number'
-     *                            If array: force only given cells. e.g: array('ean'=>'String', 'price'=>'Number')
-     *                            If null: will guess the type. 'Number' if value is numeric, 'String' otherwise
-     */
-    public function __construct(PhpSpreadsheetFactory $factory, $filename, $showHeaders = true, $columnsType = null)
+    public function __construct(PhpSpreadsheetFactory $factory, string $filename, bool $showHeaders = true, $columnsType = null)
     {
         $this->filename = $filename;
         $this->showHeaders = $showHeaders;
@@ -87,22 +62,17 @@ class XmlExcelWriter implements ComplexWriterInterface
     }
 
     /**
-     * Set a fixed column type for the wohle spreadsheet.
-     *
-     * @param array $formats
+     * @inheritdoc
      */
-    public function setColumnsType(array $formats)
+    public function setColumnsType($types): self
     {
-        $this->columnsType = $formats;
+        $this->columnsType = $types;
     }
 
     /**
-     * Determine the fitting column type.
-     *
-     * @param $column
-     * @return mixed|null
+     * @inheritdoc
      */
-    public function getColumnType($column)
+    public function getColumnType(string $column): ?string
     {
         if (is_string($this->columnsType)) {
             return self::$typeMap[$this->columnsType];
@@ -119,20 +89,19 @@ class XmlExcelWriter implements ComplexWriterInterface
      *
      * @throws Exception
      */
-    public function open()
+    public function open(): void
     {
         $this->spreadsheet = $this->factory->createSpreadsheet();
-        $this->spreadsheet->setActiveSheetIndex(0);
-        $this->spreadsheet->getActiveSheet()->setTitle('Export');
+        $this->spreadsheet
+            ->setActiveSheetIndex(0)
+            ->setTitle('Export');
     }
 
     /**
-     * Write the header rows to the spreadsheet.
-     *
-     * @param array $header
+     * @inheritdoc
      * @throws Exception
      */
-    public function writeHeaders(array $header)
+    public function writeHeaders(array $header): void
     {
         $sheet = $this->spreadsheet->getActiveSheet();
 
@@ -164,8 +133,8 @@ class XmlExcelWriter implements ComplexWriterInterface
                         ->getStartColor()->setRGB(str_replace('#', '', $cell['color']));
 
                     // Change text color for dark backgrounds.
-                    $hsl = HslColor::fromHTML($cell['color']);
-                    if ($hsl->getLightness() < 200) {
+                    $hsl = HslColor::fromHex($cell['color']);
+                    if ($hsl->lightness < 200) {
                         $style->getFont()->setColor(new Color(Color::COLOR_WHITE));
                     }
                 }
@@ -201,10 +170,9 @@ class XmlExcelWriter implements ComplexWriterInterface
     /**
      * Write the data rows to the spreadsheet.
      *
-     * @param array $data
      * @throws Exception
      */
-    public function write(array $data)
+    public function write(array $data): void
     {
         $sheet = $this->spreadsheet->getActiveSheet();
 
@@ -220,7 +188,7 @@ class XmlExcelWriter implements ComplexWriterInterface
         }
 
         // Write data set (normally one, maybe multiple rows).
-        $this->fromArray($sheet, $data, null, 'A' . $this->position);
+        $this->fromArray($sheet, $data,  'A' . $this->position);
 
         // Did we have inserted multiple rows at once? True, if the array is two-dimensional.
         $this->position += ($this->countArrayDimensions($data) == 2) ? count($data) : 1;
@@ -231,7 +199,7 @@ class XmlExcelWriter implements ComplexWriterInterface
      *
      * @throws Exception
      */
-    public function close()
+    public function close(): void
     {
         $sheet = $this->spreadsheet->getActiveSheet();
 
@@ -271,51 +239,39 @@ class XmlExcelWriter implements ComplexWriterInterface
      *
      * @param Worksheet $sheet The spreadsheet.
      * @param array $source The data array.
-     * @param string|null $nullValue
      * @param string $startCell The cell to start at.
-     * @param bool $strictNullComparison
      * @throws Exception
      */
-    private function fromArray(Worksheet $sheet, array $source, string $nullValue = null, $startCell = 'A1', $strictNullComparison = false)
+    private function fromArray(Worksheet $sheet, array $source, string $startCell = 'A1'): void
     {
-        if (is_array($source)) {
-            // Convert a 1-D array to 2-D (for ease of looping)
-            if (!is_array(end($source))) {
-                $source = array($source);
-            }
+        // Convert a 1-D array to 2-D (for ease of looping)
+        if (!is_array(end($source))) {
+            $source = [$source];
+        }
 
-            // start coordinate
-            list ($startColumn, $startRow) = Coordinate::coordinateFromString($startCell);
+        // start coordinate
+        list ($startColumn, $startRow) = Coordinate::coordinateFromString($startCell);
 
-            // Loop through $source
-            foreach ($source as $rowData) {
-                $currentColumn = $startColumn;
-                foreach ($rowData as $key => $cellValue) {
-                    if (($strictNullComparison && $cellValue !== $nullValue) || $cellValue != $nullValue) {
-                        // Set cell value
-                        $type = $this->getColumnType($key);
-                        if ($type != null) {
-                            $sheet->getCell($currentColumn . $startRow)->setValueExplicit($cellValue, $type);
-                        } else {
-                            $sheet->getCell($currentColumn . $startRow)->setValue($cellValue);
-                        }
+        // Loop through $source
+        foreach ($source as $rowData) {
+            $currentColumn = $startColumn;
+            foreach ($rowData as $key => $cellValue) {
+                if ($cellValue != null) {
+                    // Set cell value
+                    $type = $this->getColumnType($key);
+                    if ($type != null) {
+                        $sheet->getCell($currentColumn . $startRow)->setValueExplicit($cellValue, $type);
+                    } else {
+                        $sheet->getCell($currentColumn . $startRow)->setValue($cellValue);
                     }
-                    ++$currentColumn;
                 }
-                ++$startRow;
+                ++$currentColumn;
             }
-        } else {
-            throw new Exception("Parameter \$source should be an array.");
+            ++$startRow;
         }
     }
 
-    /**
-     * Count the dimensions of an array.
-     *
-     * @param array $array
-     * @return int
-     */
-    private function countArrayDimensions(array $array)
+    private function countArrayDimensions(array $array): int
     {
         return is_array(reset($array)) ? $this->countArrayDimensions(reset($array)) + 1 : 1;
     }

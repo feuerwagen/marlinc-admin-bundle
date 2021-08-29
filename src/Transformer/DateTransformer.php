@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 15:43
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
@@ -13,26 +8,19 @@ use Marlinc\AdminBundle\Export\ExportColumn;
 class DateTransformer implements TransformerInterface
 {
     /**
-     * @var string date() format.
+     * @var string date() format string.
      */
-    private $format;
+    private string $format;
 
-    /**
-     * DateTransformer constructor.
-     * @param string $format
-     */
-    public function __construct($format)
+    public function __construct(string $format)
     {
         $this->format = $format;
     }
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return array
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $key => $value) {
             $data[$key] =  ($value instanceof \DateTime) ? $value->format($this->format) : $value;

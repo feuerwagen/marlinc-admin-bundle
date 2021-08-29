@@ -1,43 +1,37 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 17:30
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Marlinc\AdminBundle\Admin\AbstractAdmin;
 use Marlinc\AdminBundle\Bridge\AdminExporter;
 use Marlinc\AdminBundle\Handler\SortableHandler;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Exception\ModelManagerException;
+use Sonata\AdminBundle\Model\AuditManagerInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Marlinc\AdminBundle\Model\TrashManager;
 use Sonata\AdminBundle\Controller\CRUDController;
 
 class MarlincAdminController extends CRUDController
 {
+    public static function getSubscribedServices(): array
+    {
+        return [
+                AdminExporter::class,
+            ] + parent::getSubscribedServices();
+    }
+
     /**
-     * Move element
-     *
-     * @param integer $id
-     * @param integer|null $childId
-     * @param string $position
-     *
-     * @return Response
+     * Move element to a new position.
+     * TODO: Test this functionality - does it even work?
      */
-    public function moveAction($id, $childId = null, $position, SortableHandler $sortableHandler)
+    public function moveAction(Request $request, SortableHandler $sortableHandler, int $id, ?int $childId, int $position): Response
     {
         $objectId = $childId !== null ? $childId : $id;
 
@@ -49,7 +43,7 @@ class MarlincAdminController extends CRUDController
         $object->setPosition($position);
         $this->admin->update($object);
 
-        if ($this->isXmlHttpRequest()) {
+        if ($this->isXmlHttpRequest($request)) {
             return $this->renderJson(array(
                 'result' => 'ok',
                 'objectId' => $this->admin->getNormalizedIdentifier($object)
@@ -61,15 +55,9 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * Revert hystory
-     *
-     * @param Request $request
-     * @param int $id
-     * @param int $revision
-     *
-     * @return RedirectResponse|Response
+     * Revert entity history to a specified revision.
      */
-    public function historyRevertAction(Request $request, $id, $revision)
+    public function historyRevertAction(Request $request, AuditManagerInterface $manager, int $id, int $revision): Response
     {
         $id = $request->get($this->admin->getIdParameter());
         $object = $this->admin->getObject($id);
@@ -80,11 +68,9 @@ class MarlincAdminController extends CRUDController
 
         if ($request->getMethod() == 'POST') {
             // check the csrf token
-            $this->validateCsrfToken('sonata.history.revert');
+            $this->validateCsrfToken($request, 'sonata.history.revert');
 
             try {
-                $manager = $this->get('sonata.admin.audit.manager');
-
                 if (!$manager->hasReader($this->admin->getClass())) {
                     throw new NotFoundHttpException(sprintf('unable to find the audit reader for class : %s', $this->admin->getClass()));
                 }
@@ -92,15 +78,14 @@ class MarlincAdminController extends CRUDController
                 $reader = $manager->getReader($this->admin->getClass());
                 $reader->revert($object, $revision);
 
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(array('result' => 'ok'));
                 }
 
                 $this->addFlash('sonata_flash_success', $this->get('translator')->trans('flash_history_revert_successfull', array(), 'MarlincAdminBundle'));
 
             } catch (ModelManagerException $e) {
-
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(array('result' => 'error'));
                 }
 
@@ -118,13 +103,9 @@ class MarlincAdminController extends CRUDController
         ));
     }
 
-    public static function getSubscribedServices(): array
-    {
-        return [
-                AdminExporter::class,
-            ] + parent::getSubscribedServices();
-    }
-
+    /**
+     * @inheritdoc
+     */
     public function listAction(Request $request): Response
     {
         $this->assertObjectExists($request);
@@ -148,7 +129,7 @@ class MarlincAdminController extends CRUDController
         // set the theme for the current Admin Form
         $this->setFormTheme($formView, $this->admin->getFilterTheme());
 
-        $template=$this->admin->getTemplateRegistry()->getTemplate('list');
+        $template = $this->admin->getTemplateRegistry()->getTemplate('list');
 
         if ($this->has(AdminExporter::class)) {
             $exporter = $this->get(AdminExporter::class);
@@ -210,20 +191,14 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * Return the Response object associated to the trash action.
-     * Overridden to fix the invocation of the softdeleteable trash filter.
-     *
-     * @return Response
-     * @throws AccessDeniedException|\Twig\Error\RuntimeError
+     * List all soft deleted entities.
      */
-    public function trashAction()
+    public function trashAction(EntityManagerInterface $em): Response
     {
         if (false === $this->admin->isGranted('LIST')) {
             throw new AccessDeniedException();
         }
 
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
 
@@ -250,14 +225,10 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * @param Request $request
-     * @param $id
-     * @return Response
+     * Undelete an entity from the trash.
      */
-    public function untrashAction(Request $request, $id,TrashManager $trashManager)
+    public function untrashAction(Request $request, EntityManagerInterface $em): Response
     {
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
 
@@ -268,16 +239,16 @@ class MarlincAdminController extends CRUDController
             throw new NotFoundHttpException(sprintf('unable to find the object with id : %s', $id));
         }
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->getMethod() == Request::METHOD_POST) {
             // check the csrf token
-            $this->validateCsrfToken('sonata.untrash');
+            $this->validateCsrfToken($request, 'sonata.untrash');
 
             try {
                 $object->setDeletedAt(null);
                 $object->setDeletedBy(null);
                 $this->admin->update($object);
 
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(['result' => 'ok']);
                 }
 
@@ -285,7 +256,7 @@ class MarlincAdminController extends CRUDController
 
             } catch (ModelManagerException $e) {
 
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(['result' => 'error']);
                 }
 
@@ -303,26 +274,14 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * Delete action.
-     *
-     * @param int|string|null $id
-     *
-     * @return Response|RedirectResponse
-     * @throws AccessDeniedException If access is not granted
-     * @throws \Exception
-     *
-     * @throws NotFoundHttpException If the object does not exist
+     * Delete an entity for real.
      */
-    public function realdeleteAction($id)
+    public function realdeleteAction(Request $request, EntityManagerInterface $em): Response
     {
-        $request = $this->getRequest();
-        $id = $request->get($this->admin->getIdParameter());
-
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
 
+        $id = $request->get($this->admin->getIdParameter());
         $object = $this->admin->getObject($id);
 
         if (!$object) {
@@ -338,16 +297,16 @@ class MarlincAdminController extends CRUDController
             return $preResponse;
         }
 
-        if ('DELETE' == $this->getRestMethod()) {
+        if ($request->getMethod() === Request::METHOD_DELETE) {
             // check the csrf token
-            $this->validateCsrfToken('sonata.realdelete');
+            $this->validateCsrfToken($request, 'sonata.realdelete');
 
             $objectName = $this->admin->toString($object);
 
             try {
                 $this->admin->delete($object);
 
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(['result' => 'ok'], 200, []);
                 }
 
@@ -362,7 +321,7 @@ class MarlincAdminController extends CRUDController
             } catch (ModelManagerException $e) {
                 $this->handleModelManagerException($e);
 
-                if ($this->isXmlHttpRequest()) {
+                if ($this->isXmlHttpRequest($request)) {
                     return $this->renderJson(['result' => 'error'], 200, []);
                 }
 
@@ -376,40 +335,37 @@ class MarlincAdminController extends CRUDController
                 );
             }
 
-            return $this->redirectTo($object);
+            return $this->redirectToTrash();
         }
 
         return $this->renderWithExtraParams($this->admin->getTemplate('realdelete'), [
             'object' => $object,
             'action' => 'delete',
             'csrf_token' => $this->getCsrfToken('sonata.realdelete'),
-        ], null);
+        ]);
     }
 
-    public function batchTrashAction()
+    /**
+     * Move a batch of entities to the trash.
+     */
+    public function batchTrashAction(Request $request): Response
     {
         if ($this->admin instanceof AbstractAdmin) {
             $this->admin->setDatagridMode(AbstractAdmin::MODE_TRASH);
         }
 
-        return $this->batchAction();
+        return $this->batchAction($request);
     }
 
     /**
      * Execute a batch delete while in trash.
-     *
-     * @param ProxyQueryInterface $query
-     * @return RedirectResponse
-     * @throws \Exception
      */
-    public function batchActionRealdelete(ProxyQueryInterface $query)
+    public function batchActionRealdelete(ProxyQueryInterface $query, EntityManagerInterface $em): Response
     {
         $this->admin->checkAccess('batchDelete');
 
         $modelManager = $this->admin->getModelManager();
 
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
 
@@ -431,18 +387,12 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * Execute a batch delete while in trash.
-     *
-     * @param ProxyQueryInterface $query
-     * @return RedirectResponse
-     * @throws \Exception
+     * Undelete a batch of entities while in trash.
      */
-    public function batchActionUntrash(ProxyQueryInterface $query)
+    public function batchActionUntrash(ProxyQueryInterface $query, EntityManagerInterface $em): Response
     {
         $this->admin->checkAccess('edit');
 
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManager();
         $em->getFilters()->disable('softdeleteable');
         $em->getFilters()->enable('softdeleteabletrash');
 
@@ -466,8 +416,6 @@ class MarlincAdminController extends CRUDController
                 $em->clear();
             } catch (\PDOException $e) {
                 throw new ModelManagerException('', 0, $e);
-            } catch (DBALException $e) {
-                throw new ModelManagerException('', 0, $e);
             }
 
             $this->addFlash(
@@ -486,11 +434,9 @@ class MarlincAdminController extends CRUDController
     }
 
     /**
-     * Redirects the user to the list view.
-     *
-     * @return RedirectResponse
+     * Redirects the user to the trash list view.
      */
-    final protected function redirectToTrash()
+    final protected function redirectToTrash(): RedirectResponse
     {
         $parameters = [];
 

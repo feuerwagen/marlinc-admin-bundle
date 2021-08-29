@@ -1,23 +1,11 @@
 <?php
+declare(strict_types=1);
 
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace Marlinc\AdminBundle\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * Class SortableHandler
- *
- * @author Romain Honel <romain.honel@gmail.com>
- */
 class SortableHandler
 {
     /**
@@ -28,31 +16,17 @@ class SortableHandler
     const MOVE_DOWN = 'down';
     const MOVE_BOTTOM = 'bottom';
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /**
-     * SortableHandler constructor.
-     *
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
     }
 
     /**
      * Get new position
-     *
-     * @param mixed $object
-     * @param int   $position
-     * @param int   $lastPosition
-     *
-     * @return int
      */
-    public function getPosition($object, $position, $lastPosition)
+    public function getPosition($object, int $position, int $lastPosition): int
     {
         switch ($position) {
             case self::MOVE_UP:
@@ -85,12 +59,8 @@ class SortableHandler
 
     /**
      * Get entity last position
-     *
-     * @param mixed $object
-     *
-     * @return int
      */
-    public function getLastPosition($object)
+    public function getLastPosition($object): int
     {
         $repository = $this->em->getRepository(get_class($object));
 

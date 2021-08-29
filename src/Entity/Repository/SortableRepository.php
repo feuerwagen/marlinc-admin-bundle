@@ -1,33 +1,22 @@
 <?php
+declare(strict_types=1);
 
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace Marlinc\AdminBundle\Entity\Repository;
 
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Gedmo\Sortable\Entity\Repository\SortableRepository as BaseSortableRepository;
 
-/**
- * Class SortableRepository
- *
- * @author Romain Honel <romain.honel@gmail.com>
- */
 class SortableRepository extends BaseSortableRepository
 {
     /**
-     * Get max position
+     * Get max position of all entities
      *
-     * @param null $object
-     *
-     * @return mixed
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getMaxPosition($object = null)
+    public function getMaxPosition(?object $object = null): int
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb
@@ -49,9 +38,10 @@ class SortableRepository extends BaseSortableRepository
             }
         }
 
-        $query = $qb->getQuery();
-        $query->useQueryCache(false);
-        $query->useResultCache(false);
+        $query = $qb->getQuery()
+            ->useQueryCache(false)
+            ->disableResultCache()
+        ;
 
         return $query->getSingleScalarResult();
     }

@@ -1,36 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 02.03.18
- * Time: 15:57
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Color;
 
-class HslColor
+/**
+ * Defines a HSL color value
+ */
+final class HslColor
 {
-    /**
-     * @var int
-     */
-    private $hue;
+    public int $hue;
 
-    /**
-     * @var int
-     */
-    private $saturation;
+    public int $saturation;
 
-    /**
-     * @var int
-     */
-    private $lightness;
+    public int $lightness;
 
-    /**
-     * HslColor constructor.
-     * @param int $hue
-     * @param int $saturation
-     * @param int $lightness
-     */
     public function __construct(int $hue, int $saturation, int $lightness)
     {
         $this->hue = $hue;
@@ -39,84 +22,18 @@ class HslColor
     }
 
     /**
-     * @return int
+     * @param string $code RGB Hex color code
      */
-    public function getHue(): int
+    public static function fromHex(string $code): self
     {
-        return $this->hue;
+        return self::fromDecimal(self::hexToInt($code));
     }
 
-    /**
-     * @param int $hue
-     * @return HslColor
-     */
-    public function setHue(int $hue): HslColor
+    public static function fromRGB(int $red, int $green, int $blue): self
     {
-        $this->hue = $hue;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSaturation(): int
-    {
-        return $this->saturation;
-    }
-
-    /**
-     * @param int $saturation
-     * @return HslColor
-     */
-    public function setSaturation(int $saturation): HslColor
-    {
-        $this->saturation = $saturation;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLightness(): int
-    {
-        return $this->lightness;
-    }
-
-    /**
-     * @param int $lightness
-     * @return HslColor
-     */
-    public function setLightness(int $lightness): HslColor
-    {
-        $this->lightness = $lightness;
-
-        return $this;
-    }
-
-    /**
-     * @param string $code
-     * @return HslColor
-     */
-    public static function fromHTML(string $code): HslColor
-    {
-        return self::fromRGB(self::HTMLToRGB($code));
-    }
-
-    /**
-     * @param int $rgb
-     * @return HslColor
-     */
-    public static function fromRGB(int $rgb): HslColor
-    {
-        $r = 0xFF & ($rgb >> 0x10);
-        $g = 0xFF & ($rgb >> 0x8);
-        $b = 0xFF & $rgb;
-
-        $r = ((float)$r) / 255.0;
-        $g = ((float)$g) / 255.0;
-        $b = ((float)$b) / 255.0;
+        $r = ((float)$red) / 255.0;
+        $g = ((float)$green) / 255.0;
+        $b = ((float)$blue) / 255.0;
 
         $maxC = max($r, $g, $b);
         $minC = min($r, $g, $b);
@@ -150,13 +67,22 @@ class HslColor
         return new HslColor($h, $s, $l);
     }
 
+    private static function fromDecimal(int $rgb): self
+    {
+        $r = 0xFF & ($rgb >> 0x10);
+        $g = 0xFF & ($rgb >> 0x8);
+        $b = 0xFF & $rgb;
+
+        return self::fromRGB($r, $g, $b);
+    }
+
     /**
      * Convert HTML color code to RGB value.
      *
-     * @param string $htmlCode
-     * @return int
+     * @param string $htmlCode The RGB hex color code
+     * @return int RGB decimal representation as a single number with shifted values for red and blue.
      */
-    private static function HTMLToRGB(string $htmlCode)
+    private static function hexToInt(string $htmlCode): int
     {
         // Truncate leading #.
         if ($htmlCode[0] == '#') {

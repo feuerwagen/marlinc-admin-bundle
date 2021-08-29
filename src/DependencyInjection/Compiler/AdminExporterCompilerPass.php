@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 10:24
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
@@ -14,6 +9,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Register export formats and writers with the @see AdminExporter
+ */
 final class AdminExporterCompilerPass implements CompilerPassInterface
 {
     /**

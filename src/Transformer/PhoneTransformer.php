@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 03.07.17
- * Time: 15:54
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
@@ -16,25 +11,21 @@ use Marlinc\AdminBundle\Export\ExportColumn;
 
 class PhoneTransformer implements TransformerInterface
 {
-    private $format;
-
     /**
-     * PhoneTransformer constructor.
-     * @param $format
+     * TODO: Replace string values with class constants.
+     * @var string|int One of the format constants in {@see PhoneNumberFormat}
      */
+    private int $format;
+
     public function __construct($format = PhoneNumberFormat::E164)
     {
         $this->format = $format;
     }
 
-
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return array
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $key => $value) {
             if ($value instanceof PhoneNumber) {

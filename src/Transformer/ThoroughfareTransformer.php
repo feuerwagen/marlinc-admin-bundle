@@ -1,34 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 04.07.17
- * Time: 16:51
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Transformer;
 
 
 class ThoroughfareTransformer implements TransformerInterface
 {
-    private $type;
+    /**
+     * TODO: Replace with class constants.
+     * @var string|mixed
+     */
+    private string $type;
 
     /**
      * ThoroughfareTransformer constructor.
      * @param $type
      */
-    public function __construct($type = 'street')
+    public function __construct(string $type = 'street')
     {
         $this->type = $type;
     }
 
     /**
-     * @param string $name
-     * @param int $type
-     * @param array $data
-     * @return mixed
+     * @inheritdoc
      */
-    public function transform(string $name, int $type, array $data)
+    public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $element) {
             if (preg_match('/([^\d]+)\s?(.+)/i', $element, $result)) {
@@ -39,7 +35,6 @@ class ThoroughfareTransformer implements TransformerInterface
                     case 'street':
                     default:
                         return [$name => $result[1]];
-                        break;
                 }
             } elseif ($this->type == 'street') {
                 return [$name => $element];

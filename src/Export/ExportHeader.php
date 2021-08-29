@@ -1,25 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 16:57
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Export;
 
-
+/**
+ * Defines the header row(s) of an @see ExportColumn.
+ * Each header has at least one (or more) simple field(s) and can have one group field.
+ * If a group field is set, the header will be displayed in two rows with
+ * the group field on top and the simple fields below.
+ */
 class ExportHeader
 {
-    /**
-     * @var array
-     */
-    private $simpleFields;
+    private array $simpleFields;
 
-    /**
-     * @var array
-     */
-    private $groupFields;
+    private array $groupFields;
 
     /**
      * ExportHeader constructor.
@@ -30,22 +24,15 @@ class ExportHeader
         $this->groupFields = [];
     }
 
-    public static function createSimpleHeader(string $name, $color = null, $font = null, $comment = '', $colspan = null) {
+    public static function createSimpleHeader(string $name, $color = null, $font = null, string $comment = '', int $colspan = null): self
+    {
         $header = new self();
         $header->addSimpleField($name, $color, $font, $comment, $colspan);
 
         return $header;
     }
 
-    /**
-     * @param string $name
-     * @param string $color
-     * @param string $font
-     * @param string $comment
-     * @param int $colspan
-     * @return self
-     */
-    public function addSimpleField($name, $color = null, $font = null, $comment = '', $colspan = null)
+    public function addSimpleField(string $name, $color = null, $font = null, string $comment = '', int $colspan = null): self
     {
         $field = [
             'name' => $name,
@@ -63,15 +50,8 @@ class ExportHeader
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @param string $color
-     * @param string $font
-     * @param string $comment
-     * @param int $colspan
-     * @return ExportHeader
-     */
-    public function addGroupField($name, $color = null, $font = null, $comment = '', $colspan = null) {
+    public function addGroupField(string $name, $color = null, $font = null, string $comment = '', int $colspan = null): self
+    {
         $field = [
             'name' => $name,
             'comment' => $comment,
@@ -88,11 +68,13 @@ class ExportHeader
         return $this;
     }
 
-    public function hasGroupField() {
+    public function hasGroupField(): bool
+    {
         return count($this->groupFields) > 0;
     }
 
-    public function getGroupField() {
+    public function getGroupField(): array
+    {
         if (count($this->groupFields) == 0) {
             $field = [
                 'name' => '',
@@ -111,7 +93,8 @@ class ExportHeader
         return $field;
     }
 
-    public function getGroupFields() {
+    public function getGroupFields(): array
+    {
         if (count($this->groupFields) == 0 && count($this->simpleFields) == 0) {
             return [];
         }
@@ -123,11 +106,13 @@ class ExportHeader
         return $this->groupFields;
     }
 
-    public function getSimpleFields() {
+    public function getSimpleFields(): array
+    {
         return $this->simpleFields;
     }
 
-    public function getColumnCount() {
+    public function getColumnCount(): int
+    {
         return count($this->simpleFields);
     }
 }

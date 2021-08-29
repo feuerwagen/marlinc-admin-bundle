@@ -1,24 +1,14 @@
 <?php
-
-/*
- * This file is part of the YesWeHack BugBounty backend
- *
- * (c) Romain Honel <romain.honel@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+
 
 /**
- * Class AddAuditEntityCompilerPass
- *
- * @author Romain Honel <romain.honel@gmail.com>
+ * Register the audit reader for all entities with an admin that is enabled for audit.
  */
 class AddAuditEntityCompilerPass implements CompilerPassInterface
 {
@@ -48,16 +38,10 @@ class AddAuditEntityCompilerPass implements CompilerPassInterface
 
         $auditedEntities = array_unique($auditedEntities);
 
-        $container->getDefinition('sonata.admin.audit.manager')->addMethodCall('setReader', array('marlinc.admin.audit.orm.reader', $auditedEntities));
+        $container->getDefinition('sonata.admin.audit.manager')->addMethodCall('setReader', ['marlinc.admin.audit.orm.reader', $auditedEntities]);
     }
 
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getModelName(ContainerBuilder $container, $name)
+    private function getModelName(ContainerBuilder $container, string $name): string
     {
         if ($name[0] == '%') {
             return $container->getParameter(substr($name, 1, -1));

@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: em
- * Date: 14.06.18
- * Time: 13:01
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Entity;
 
@@ -12,51 +7,37 @@ namespace Marlinc\AdminBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Implements @see EntityAssignedUsersInterface
+ * TODO: Move to EntityBundle
+ */
 trait GenericEntityAssignedUsersTrait
 {
-    /**
-     * @inheritDoc
-     */
     public static function getParents(): ?array
     {
         return null; // No dedicated field for parent entities.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getUsers(): Collection
     {
-        // Nothing to do here, files don't have own users.
+        // Nothing to do here, this entity doesn't have its own users.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function setUsers(Collection $users)
     {
-        // Nothing to do here, files don't have own users.
+        // Nothing to do here, this entity doesn't have its own users.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function addUser(UserInterface $user)
     {
-        // Nothing to do here, files don't have own users.
+        // Nothing to do here, this entity doesn't have its own users.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function removeUser(UserInterface $user)
     {
-        // Nothing to do here, files don't have own users.
+        // Nothing to do here, this entity doesn't have its own users.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function hasUser(UserInterface $user): bool
     {
         if ($this->getReferencingEntities()->isEmpty()) {

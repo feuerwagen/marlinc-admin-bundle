@@ -1,21 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 18.05.17
- * Time: 10:49
- */
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Filter;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\DoctrineORMAdminBundle\Filter\ModelFilter as BaseFilter;
 use Sonata\DoctrineORMAdminBundle\Filter\Filter;
 use Sonata\AdminBundle\Filter\Model\FilterData;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ModelFilter extends Filter
 {
@@ -23,18 +21,11 @@ class ModelFilter extends Filter
     const TYPE_NOT_CONTAINS = 2;
     const TYPE_EQUAL = 3;
 
-    private $decorated;
+    private BaseFilter $decorated;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /**
-     * ModelFilter constructor.
-     * @param EntityManager $em
-     */
-    public function __construct(BaseFilter $decorated,EntityManager $em)
+    public function __construct(BaseFilter $decorated, EntityManager $em)
     {
         $this->em = $em;
         $this->decorated = $decorated;
@@ -102,13 +93,14 @@ class ModelFilter extends Filter
         }
     }
 
-    protected function extraAssociation(ProxyQueryInterface $queryBuilder) {
-        $types = array(
+    protected function extraAssociation(ProxyQueryInterface $queryBuilder): string
+    {
+        $types = [
             ClassMetadataInfo::ONE_TO_ONE,
             ClassMetadataInfo::ONE_TO_MANY,
             ClassMetadataInfo::MANY_TO_MANY,
             ClassMetadataInfo::MANY_TO_ONE,
-        );
+        ];
 
         if (!in_array($this->getOption('mapping_type'), $types)) {
             throw new \RuntimeException('Invalid mapping type');
@@ -126,24 +118,21 @@ class ModelFilter extends Filter
         }
 
         $queryBuilder->leftJoin(sprintf('%s.%s', $alias, $associationMapping['fieldName']), $newAlias);
-        $alias = $newAlias;
 
-        return $alias;
+        return $newAlias;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getDefaultOptions():array
+    public function getDefaultOptions(): array
     {
-        return array(
+        return [
             'mapping_type' => false,
             'field_name' => false,
-            'field_type' => method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-                ? 'Symfony\Bridge\Doctrine\Form\Type\EntityType'
-                : 'entity', // NEXT_MAJOR: Remove ternary (when requirement of Symfony is >= 2.8)
-            'field_options' => array(),
-            'operator_type' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+            'field_type' => EntityType::class,
+            'field_options' => [],
+            'operator_type' => ChoiceType::class,
             'operator_options' => [
                 'choices' => [
                     'label_type_contains' => self::TYPE_CONTAINS,
@@ -152,6 +141,6 @@ class ModelFilter extends Filter
                 ],
                 'choice_translation_domain' => 'SonataAdminBundle',
             ],
-        );
+        ];
     }
 }

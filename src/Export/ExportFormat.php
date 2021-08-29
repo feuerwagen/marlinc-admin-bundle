@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 14:59
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Export;
 
@@ -30,12 +25,9 @@ class ExportFormat implements ExportFormatInterface
     /**
      * @var PropertyPath[]
      */
-    protected array $propertyPaths = [];
+    protected ?array $propertyPaths = null;
 
-    /**
-     * @var PropertyAccessor
-     */
-    protected PropertyAccessor $propertyAccessor;
+    protected ?PropertyAccessor $propertyAccessor = null;
 
     /**
      * @inheritdoc
@@ -47,6 +39,9 @@ class ExportFormat implements ExportFormatInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getRow(object $currentObject): array
     {
         $data = [];
@@ -59,6 +54,9 @@ class ExportFormat implements ExportFormatInterface
         return $data;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getHeader(): array
     {
         $hasGroupHeaders = false;
@@ -113,6 +111,9 @@ class ExportFormat implements ExportFormatInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getFilename(AdminInterface $admin, $filetype): string
     {
         $class = $admin->getClass();
@@ -125,6 +126,9 @@ class ExportFormat implements ExportFormatInterface
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getColumnsType(): array
     {
         $types = [];
@@ -142,11 +146,14 @@ class ExportFormat implements ExportFormatInterface
      */
     public function getSourceIterator(Query $query): SourceIteratorInterface
     {
-        return new ComplexStructureSourceIterator($query, $this);
+        return new ComplexStructureSourceIterator($query, $this, 100);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getFileType(): string
     {
-        return  $this->filetype;
+        return $this->filetype;
     }
 }

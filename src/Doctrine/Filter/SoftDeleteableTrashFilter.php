@@ -1,38 +1,41 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Marlinc\AdminBundle\Doctrine\Filter;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetaData;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
 
+/**
+ * Filter entity queries to only display soft deleted entities if enabled for the entity class.
+ */
 class SoftDeleteableTrashFilter extends SQLFilter
 {
-    /**
-     * @var SoftDeleteableListener|null
-     */
-    protected $listener;
+    protected ?SoftDeleteableListener $listener = null;
+
+    protected ?EntityManagerInterface $entityManager = null;
 
     /**
-     * @var EntityManager
+     * @var array<string,bool> The enabled entity classes for this filter.
      */
-    protected $entityManager;
-
-    /**
-     * @var array The enabled entity classes for this filter.
-     */
-    protected $enabled = array();
+    protected $enabled = [];
 
     /**
      * {@inheritdoc}
      */
-    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias): string
     {
         $class = $targetEntity->getName();
 
         // Classes can be explicitly enabled.
-        if (!empty($this->enabled) && (!array_key_exists($class, $this->enabled) || $this->enabled[$class] === false)) {
+        if (
+            !array_key_exists($class, $this->enabled) || $this->enabled[$class] === false
+            || array_key_exists($targetEntity->rootEntityName, $this->enabled) && $this->enabled[$targetEntity->rootEntityName] === false
+        ) {
             return '';
         }
 
@@ -68,10 +71,7 @@ class SoftDeleteableTrashFilter extends SQLFilter
         $this->enabled[$class] = true;
     }
 
-    /**
-     * @return SoftDeleteableListener|null
-     */
-    protected function getListener()
+    protected function getListener(): SoftDeleteableListener
     {
         if ($this->listener === null) {
             $em = $this->getEntityManager();
@@ -82,7 +82,7 @@ class SoftDeleteableTrashFilter extends SQLFilter
                     if ($listener instanceof SoftDeleteableListener) {
                         $this->listener = $listener;
 
-                        break 2;
+                        return $this->listener;
                     }
                 }
             }
@@ -95,10 +95,7 @@ class SoftDeleteableTrashFilter extends SQLFilter
         return $this->listener;
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         if ($this->entityManager === null) {
             $refl = new \ReflectionProperty('Doctrine\ORM\Query\Filter\SQLFilter', 'em');
