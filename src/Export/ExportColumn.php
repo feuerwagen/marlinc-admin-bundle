@@ -57,11 +57,11 @@ class ExportColumn
      */
     protected ?ExportHeader $header;
 
-    protected int $format;
+    protected ?int $format = null;
 
     protected ?array $effectiveColumns = null;
 
-    public function __construct(string $name, int $type, TransformerInterface $transformer = null, array $fields = [], ExportHeader $header = null, ?int $format = null)
+    public function __construct(string $name, int $type, ?TransformerInterface $transformer = null, array $fields = [], ?ExportHeader $header = null, ?int $format = null)
     {
         $this->name = $name;
         $this->type = $type;

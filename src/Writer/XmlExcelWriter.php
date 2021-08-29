@@ -67,6 +67,8 @@ class XmlExcelWriter implements ComplexWriterInterface
     public function setColumnsType($types): self
     {
         $this->columnsType = $types;
+
+        return $this;
     }
 
     /**

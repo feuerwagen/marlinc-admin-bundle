@@ -32,7 +32,7 @@ class ExportFormat implements ExportFormatInterface
     /**
      * @inheritdoc
      */
-    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, $fields = [''], ExportHeader $header = null, int $format = null): self
+    public function addColumn(string $name, int $type, ?TransformerInterface $transformer = null, array $fields = [''], ?ExportHeader $header = null, ?int $format = null): self
     {
         $this->columns[] = new ExportColumn($name, $type, $transformer, $fields, $header, $format);
 

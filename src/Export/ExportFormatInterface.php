@@ -15,7 +15,7 @@ interface ExportFormatInterface
      * - a name (used as a header)
      * - a type (defining how the column will be rendered)
      */
-    public function addColumn(string $name, int $type, TransformerInterface $transformer = null, array $fields = [''], ExportHeader $header = null, int $format = null): self;
+    public function addColumn(string $name, int $type, ?TransformerInterface $transformer = null, array $fields = [''], ?ExportHeader $header = null, ?int $format = null): self;
 
     public function getFiletype(): string;
 

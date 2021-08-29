@@ -23,8 +23,8 @@ class MarlincAdminController extends CRUDController
     public static function getSubscribedServices(): array
     {
         return [
-                AdminExporter::class,
-            ] + parent::getSubscribedServices();
+            AdminExporter::class,
+        ] + parent::getSubscribedServices();
     }
 
     /**

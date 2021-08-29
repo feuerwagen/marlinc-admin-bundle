@@ -17,8 +17,6 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
 
     protected iterable $results;
 
-    private int $index;
-
     private int $batchSize;
 
     public function __construct(Query $query, ExportFormatInterface $format, int $batchSize = 100) {
@@ -41,7 +39,7 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
      */
     public function current()
     {
-        $data = $this->format->getRow($this->results[$this->index]);
+        $data = $this->format->getRow($this->results->current());
 
         // Make sure to unload the entities after a certain batch has been read.
         if (0 === ($this->key() % $this->batchSize)) {
@@ -56,7 +54,7 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
      */
     public function next()
     {
-        $this->index++;
+        $this->results->next();
     }
 
     /**
@@ -64,7 +62,7 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
      */
     public function key()
     {
-        return $this->index;
+        return $this->results->key();
     }
 
     /**
@@ -72,7 +70,7 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
      */
     public function valid(): bool
     {
-        return isset($this->results[$this->index]);
+        return $this->results->valid();
     }
 
     /**
@@ -80,7 +78,6 @@ class ComplexStructureSourceIterator implements SourceIteratorInterface
      */
     public function rewind()
     {
-        $this->index = 0;
+        $this->results->rewind();
     }
-
 }

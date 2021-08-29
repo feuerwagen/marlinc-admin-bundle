@@ -5,12 +5,9 @@
         <parameter key="phpspreadsheet.class">Marlinc\AdminBundle\Factory\PhpSpreadsheetFactory</parameter>
     </parameters>
     <services>
-        <service id="Marlinc\AdminBundle\Controller\MarlincAdminController" public="true">
-            <tag name="controller.service_subscriber" />
+        <service id="Marlinc\AdminBundle\Controller\MarlincAdminController" autowire="true">
+            <tag name="container.service_subscriber" />
             <tag name="controller.service_arguments" />
-            <call method="setContainer">
-                <argument type="service" id="service_container" />
-            </call>
         </service>
         <service id="Marlinc\AdminBundle\Writer\XmlExcelWriter">
             <tag name="sonata.exporter.writer"/>
