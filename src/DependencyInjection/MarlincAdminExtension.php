@@ -34,8 +34,7 @@ class MarlincAdminExtension extends Extension
             }
         }
 
-        $container->registerForAutoconfiguration(MarlincAdminController::class)
-            ->addTag('controller.service_arguments');
+        // TODO: Set default controller config value for SonataAdmin
     }
 
 }
