@@ -137,9 +137,8 @@ final class AdminExporter
         }
         $writer = $this->writers[$filetype];
 
-        $callback = function () use ($source, $writer, $format) {
-            $handler = ExportHandler::create($source, $format, $writer);
-            $handler->export();
+        $callback = function() use ($source, $writer, $format) {
+            $this->export($source, $format, $writer);
         };
 
         $headers = [
@@ -148,5 +147,27 @@ final class AdminExporter
         ];
 
         return new StreamedResponse($callback, 200, $headers);
+    }
+
+    /**
+     * Generate the export stream.
+     *
+     * @throws \Sonata\Exporter\Exception\SonataExporterException
+     */
+    private function export(SourceIteratorInterface $source, ExportFormat $format, WriterInterface $writer): void
+    {
+        $writer->open();
+        $typesWritten = false;
+
+        foreach ($source as $data) {
+            if ($writer instanceof ComplexWriterInterface && !$typesWritten) {
+                $writer->writeHeaders($format->getHeader());
+                $writer->setColumnsType($format->getColumnsType());
+                $typesWritten = true;
+            }
+            $writer->write($data);
+        }
+
+        $writer->close();
     }
 }
