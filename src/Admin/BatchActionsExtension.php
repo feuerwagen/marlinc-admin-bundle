@@ -17,7 +17,7 @@ class BatchActionsExtension extends AbstractAdminExtension
             $actions['realdelete'] = [
                 'label' => 'action_real_delete',
                 'translation_domain' => 'MarlincAdminBundle',
-                'ask_confirmation' => true, // by default always true
+                'template' => '@MarlincAdmin/edit/batch_trash_confirmation.html.twig'
             ];
         }
 
@@ -25,7 +25,7 @@ class BatchActionsExtension extends AbstractAdminExtension
             $actions['untrash'] = [
                 'label' => 'action_restore',
                 'translation_domain' => 'MarlincAdminBundle',
-                'ask_confirmation' => true, // by default always true
+                'template' => '@MarlincAdmin/edit/batch_trash_confirmation.html.twig'
             ];
         }
 

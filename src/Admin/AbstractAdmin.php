@@ -1,157 +1,58 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 21.03.17
- * Time: 15:43
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Admin;
 
 
 use Sonata\AdminBundle\Admin\AbstractAdmin as BaseAdmin;
-use Sonata\AdminBundle\Datagrid\DatagridMapper;
+use Sonata\AdminBundle\Datagrid\DatagridInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
-use Sonata\AdminBundle\FieldDescription\FieldDescriptionCollection;
-use Sonata\AdminBundle\Form\Type\ModelHiddenType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Countries;
 
 abstract class AbstractAdmin extends BaseAdmin
 {
     const MODE_TRASH = 'trash';
-
     const MODE_LIST = 'list';
 
-    /**
-     * The default number of results to display in the list.
-     *
-     * @var int
-     */
-    protected $maxPerPage = 20;
+    private string $datagridMode = AbstractAdmin::MODE_LIST;
 
-    /**
-     * Predefined per page options.
-     *
-     * @var array
-     */
-    protected $perPageOptions = [10, 20, 50, 100, 200];
-
-    /**
-     * Default values to the datagrid.
-     *
-     * @var array
-     */
-    protected $datagridValues = [
-        '_sort_order' => 'DESC',
-        '_sort_by' => 'updatedAt',
-    ];
-
-    /**
-     * The list collection.
-     *
-     * @var FieldDescriptionCollection
-     */
-    private $list;
-
-    /**
-     * @var string
-     */
-    private $datagridMode = AbstractAdmin::MODE_LIST;
-
-    protected function getFilteredLanguages() {
+    protected function getFilteredLanguages(): array
+    {
         \Locale::setDefault('en');
+        // TODO: Filter depending on app/admin config
         return Languages::getNames();
     }
 
-    protected function getFilteredCountries() {
+    protected function getFilteredCountries(): array
+    {
         \Locale::setDefault('en');
+        // TODO: Filter depending on app/admin config
         return Countries::getNames();
     }
 
-    // TODO: the following methods are intended to extend the normal list view with a variant for a trash list.
-    //  Update this to SonataAdmin 4.x, preferably by using the provided extesion points.
-
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function getTemplate($name)
+    protected function configureDefaultSortValues(array &$sortValues): void
     {
-        if ($this->datagridMode == 'trash' && $name == 'batch_confirmation') {
-            return '@MarlincAdmin/edit/batch_trash_confirmation.html.twig';
-        }
+        $sortValues[DatagridInterface::SORT_BY] = 'updatedAt';
+        $sortValues[DatagridInterface::SORT_ORDER] = 'DESC';
 
-        return $this->getTemplateRegistry()->getTemplate($name);
+        // Override sort for trash mode.
+        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
+            $sortValues[DatagridInterface::SORT_BY] = 'deletedAt';
+        }
     }
 
-    public function getDatagridMode()
+    public function getDatagridMode(): string
     {
         return $this->datagridMode;
     }
 
-    public function setDatagridMode(string $mode)
+    public function setDatagridMode(string $mode): void
     {
         $this->datagridMode = $mode;
-    }
-
-    public function buildDatagrid()
-    {
-        if ($this->datagrid) {
-            return;
-        }
-
-        // Override sort.
-        if ($this->datagridMode == AbstractAdmin::MODE_TRASH) {
-            $this->datagridValues['_sort_order'] = 'DESC';
-            $this->datagridValues['_sort_by'] = 'deletedAt';
-        }
-
-        $filterParameters = $this->getFilterParameters();
-
-        // transform _sort_by from a string to a FieldDescriptionInterface for the datagrid.
-        if (isset($filterParameters['_sort_by']) && is_string($filterParameters['_sort_by'])) {
-            if ($this->hasListFieldDescription($filterParameters['_sort_by'])) {
-                $filterParameters['_sort_by'] = $this->getListFieldDescription($filterParameters['_sort_by']);
-            } else {
-                $filterParameters['_sort_by'] = $this->getModelManager()->getNewFieldDescriptionInstance(
-                    $this->getClass(),
-                    $filterParameters['_sort_by'],
-                    []
-                );
-
-                $this->getListBuilder()->buildField(null, $filterParameters['_sort_by'], $this);
-            }
-        }
-
-        // initialize the datagrid
-        $this->datagrid = $this->getDatagridBuilder()->getBaseDatagrid($this, $filterParameters);
-
-        $this->datagrid->getPager()->setMaxPageLinks($this->maxPageLinks);
-
-        $mapper = new DatagridMapper($this->getDatagridBuilder(), $this->datagrid, $this);
-
-        // Build the datagrid filter
-        $this->configureDatagridFilters($mapper);
-
-        // ok, try to limit to add parent filter
-        if ($this->isChild() && $this->getParentAssociationMapping() && !$mapper->has($this->getParentAssociationMapping())) {
-            $mapper->add($this->getParentAssociationMapping(), null, [
-                'show_filter' => false,
-                'label' => false,
-                'field_type' => ModelHiddenType::class,
-                'field_options' => [
-                    'model_manager' => $this->getModelManager(),
-                ],
-                'operator_type' => HiddenType::class,
-            ], null, null, [
-                'admin_code' => $this->getParent()->getCode(),
-            ]);
-        }
-
-        foreach ($this->getExtensions() as $extension) {
-            $extension->configureDatagridFilters($mapper);
-        }
     }
 
     protected function configureTrashFields(ListMapper $mapper)
@@ -159,8 +60,8 @@ abstract class AbstractAdmin extends BaseAdmin
         $mapper
             ->add('deletedAt')
             ->add('deletedBy')
-            ->add('_action', null, [
-                'actions' => [
+            ->add(ListMapper::NAME_ACTIONS, null, [
+                ListMapper::TYPE_ACTIONS => [
                     'untrash' => [],
                 ]
             ])
@@ -170,13 +71,13 @@ abstract class AbstractAdmin extends BaseAdmin
     protected function configureListFields(ListMapper $list):void
     {
         $list
-            ->add('action', 'actions', [
-                'actions' => [
+            ->add(ListMapper::NAME_ACTIONS, null, [
+                ListMapper::TYPE_ACTIONS => [
                     'show' => [],
                     'edit' => [],
-                    'delete' => []
-                ],
-            ]);
+                    'delete' => [],
+                ]
+            ])
         ;
     }
 }
