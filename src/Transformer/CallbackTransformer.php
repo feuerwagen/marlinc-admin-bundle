@@ -21,9 +21,7 @@ class CallbackTransformer implements TransformerInterface
     public function transform(string $name, int $type, array $data): array
     {
         foreach ($data as $key => $value) {
-            if (is_numeric($value)) {
-                $data[$key] = ($this->callback)($value);
-            }
+            $data[$key] = ($this->callback)($value);
         }
 
         if ($type == ExportColumn::TYPE_SINGLE) {
