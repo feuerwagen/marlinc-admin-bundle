@@ -44,6 +44,13 @@ class ExportFormat implements ExportFormatInterface
      */
     public function getRow(object $currentObject): array
     {
+        if ($this->propertyAccessor === null) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+        if ($this->propertyPaths === null) {
+            $this->initializePropertyPaths();
+        }
+
         $data = [];
 
         foreach ($this->columns as $column) {
@@ -95,9 +102,11 @@ class ExportFormat implements ExportFormatInterface
         return $data;
     }
 
-    public function createPropertyAccessor(): self
+    /**
+     * Collect @see PropertyPath values in the current entity class to include in the export.
+     */
+    private function initializePropertyPaths(): void
     {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->propertyPaths = [];
 
         foreach ($this->columns as $column) {
@@ -107,8 +116,6 @@ class ExportFormat implements ExportFormatInterface
                 }
             }
         }
-
-        return $this;
     }
 
     /**

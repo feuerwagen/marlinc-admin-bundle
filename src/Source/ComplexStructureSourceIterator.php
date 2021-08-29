@@ -1,123 +1,86 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 29.06.17
- * Time: 13:57
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Source;
 
 
-use Doctrine\ORM\Internal\Hydration\IterableResult;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
-use Marlinc\AdminBundle\Export\ExportFormat;
-use Sonata\Exporter\Exception\InvalidMethodCallException;
+use Marlinc\AdminBundle\Export\ExportFormatInterface;
 use Sonata\Exporter\Source\SourceIteratorInterface;
 
 class ComplexStructureSourceIterator implements SourceIteratorInterface
 {
-    /**
-     * @var Query
-     */
-    protected $query;
+    protected EntityManagerInterface $em;
 
-    /**
-     * @var ExportFormat
-     */
-    protected $format;
+    protected ExportFormatInterface $format;
 
-    /**
-     * @var IterableResult
-     */
-    protected $iterator;
+    protected iterable $results;
 
-    public function __construct(Query $query, ExportFormat $format) {
-        $this->query = clone $query;
-        $this->query->setParameters($query->getParameters());
+    private int $index;
+
+    private int $batchSize;
+
+    public function __construct(Query $query, ExportFormatInterface $format, int $batchSize = 100) {
+        // We need to clone the query and reset its parameters and hints because we don't want to add the
+        //  iterable hint to the original query.
+        $exportQuery = clone $query;
+        $exportQuery->setParameters($query->getParameters());
         foreach ($query->getHints() as $name => $value) {
-            $this->query->setHint($name, $value);
+            $exportQuery->setHint($name, $value);
         }
-        
-        $this->format = $format;
 
-        $format->createPropertyAccessor();
+        $this->results = $exportQuery->toIterable();
+        $this->em = $query->getEntityManager();
+        $this->format = $format;
+        $this->batchSize = $batchSize;
     }
 
     /**
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @inheritdoc
      */
     public function current()
     {
-        if (!$this->iterator) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
+        $data = $this->format->getRow($this->results[$this->index]);
+
+        // Make sure to unload the entities after a certain batch has been read.
+        if (0 === ($this->key() % $this->batchSize)) {
+            $this->em->clear();
         }
 
-        $current = $this->iterator->current();
-        $data = $this->format->getRow($current[0]);
-
-        $this->query->getEntityManager()->getUnitOfWork()->detach($current[0]);
         return $data;
     }
 
     /**
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
+     * @inheritdoc
      */
     public function next()
     {
-        if (!$this->iterator) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        $this->iterator->next();
+        $this->index++;
     }
 
     /**
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @inheritdoc
      */
     public function key()
     {
-        if (!$this->iterator) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return $this->iterator->key();
+        return $this->index;
     }
 
     /**
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     * @inheritdoc
      */
-    public function valid()
+    public function valid(): bool
     {
-        if (!$this->iterator) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return $this->iterator->valid();
+        return isset($this->results[$this->index]);
     }
 
     /**
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
+     * @inheritdoc
      */
     public function rewind()
     {
-        if ($this->iterator) {
-            throw new InvalidMethodCallException('Cannot rewind a Doctrine\ORM\Query');
-        }
-
-        $this->iterator = $this->query->iterate();
-        $this->iterator->rewind();
+        $this->index = 0;
     }
 
 }

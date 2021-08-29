@@ -23,8 +23,6 @@ interface ExportFormatInterface
 
     public function getHeader(): array;
 
-    public function createPropertyAccessor(): self;
-
     public function getFilename(AdminInterface $admin, $filetype): string;
 
     public function getColumnsType(): array;

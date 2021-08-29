@@ -1,58 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: elias
- * Date: 06.12.17
- * Time: 09:46
- */
+declare(strict_types=1);
 
 namespace Marlinc\AdminBundle\Source;
 
 
 use Doctrine\ORM\Query;
-use Marlinc\AdminBundle\Export\ExportFormat;
 use Marlinc\AdminBundle\Export\SummarizingExportFormatInterface;
-use Sonata\Exporter\Exception\InvalidMethodCallException;
-use Sonata\Exporter\Source\SourceIteratorInterface;
 
 /**
- * Class SummarizingSourceIterator
- * TODO: Find a more efficient way to summarize (modify DQL query!?).
- *
- * @package MarlincUtils\AdminExporterBundle\Source
+ * TODO: Find a more efficient way to aggregate (modify DQL query!?).
+ * @var $format SummarizingExportFormatInterface
  */
-class SummarizingSourceIterator implements SourceIteratorInterface
+class SummarizingSourceIterator extends ComplexStructureSourceIterator
 {
-    /**
-     * @var Query
-     */
-    protected $query;
-
-    /**
-     * @var ExportFormat
-     */
-    protected $format;
-
-    /**
-     * @var array
-     */
-    protected $result;
-
-    /**
-     * @var int
-     */
-    protected $currentKey;
-
-    public function __construct(Query $query, SummarizingExportFormatInterface $format) {
-        $this->query = clone $query;
-        $this->query->setParameters($query->getParameters());
-        foreach ($query->getHints() as $name => $value) {
-            $this->query->setHint($name, $value);
-        }
-
-        $this->format = $format;
-
-        $format->createPropertyAccessor();
+    public function __construct(Query $query, SummarizingExportFormatInterface $format, int $batchSize = 100) {
+        parent::__construct($query, $format, $batchSize);
     }
 
     /**
@@ -60,47 +22,7 @@ class SummarizingSourceIterator implements SourceIteratorInterface
      */
     public function current()
     {
-        if (!is_array($this->result)) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return $this->format->getRow(current($this->result));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function next()
-    {
-        if (!is_array($this->result)) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return next($this->result);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function key()
-    {
-        if (!is_array($this->result)) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return key($this->result);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function valid()
-    {
-        if (!is_array($this->result)) {
-            throw new InvalidMethodCallException('Iterator is not initialized');
-        }
-
-        return current($this->result);
+        return $this->format->getRow(current($this->results));
     }
 
     /**
@@ -108,18 +30,18 @@ class SummarizingSourceIterator implements SourceIteratorInterface
      */
     public function rewind()
     {
-        if (!is_array($this->result)) {
-            $this->result = [];
-            $iterator = $this->query->iterate();
+        if (!is_array($this->results) && $this->format instanceof SummarizingExportFormatInterface) {
+            $aggregated = [];
 
-            foreach ($iterator as $data) {
-                $this->format->summarizeRow($data, $this->result);
+            foreach ($this->results as $data) {
+                $this->format->summarizeRow($data, $aggregated);
             }
 
-            $this->format->completeGrid($this->result);
+            $this->format->completeGrid($aggregated);
+            $this->results = $aggregated;
         }
 
-        reset($this->result);
+        parent::rewind();
     }
 
 }
