@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class XmlExcelWriter implements ComplexWriterInterface
@@ -20,7 +21,7 @@ class XmlExcelWriter implements ComplexWriterInterface
         ComplexWriterInterface::FORMAT_STRING => DataType::TYPE_STRING,
         ComplexWriterInterface::FORMAT_NUMBER => DataType::TYPE_NUMERIC,
         ComplexWriterInterface::FORMAT_DATE => null,
-        ComplexWriterInterface::FORMAT_CURRENCY => null,
+        ComplexWriterInterface::FORMAT_CURRENCY => DataType::TYPE_NUMERIC,
         ComplexWriterInterface::FORMAT_LINK => DataType::TYPE_STRING,
         ComplexWriterInterface::FORMAT_EMAIL => DataType::TYPE_STRING
     ];
@@ -71,19 +72,27 @@ class XmlExcelWriter implements ComplexWriterInterface
         return $this;
     }
 
+    private function getComplexColumnType(string $column): ?int
+    {
+        if (is_string($this->columnsType)
+            && array_key_exists($this->columnsType, self::$typeMap)) {
+            return $this->columnsType;
+        } elseif (is_array($this->columnsType)
+            && array_key_exists($column, $this->columnsType)
+            && array_key_exists($this->columnsType[$column], self::$typeMap)) {
+            return $this->columnsType[$column];
+        }
+        return null;
+    }
+
     /**
      * @inheritdoc
      */
     public function getColumnType(string $column): ?string
     {
-        if (is_string($this->columnsType)) {
-            return self::$typeMap[$this->columnsType];
-        } elseif (is_array($this->columnsType)
-            && array_key_exists($column, $this->columnsType)
-            && array_key_exists($this->columnsType[$column], self::$typeMap)) {
-            return self::$typeMap[$this->columnsType[$column]];
-        }
-        return null;
+        $complexType = $this->getComplexColumnType($column);
+
+        return ($complexType !== null) ? self::$typeMap[$complexType] : null;
     }
 
     /**
@@ -260,11 +269,16 @@ class XmlExcelWriter implements ComplexWriterInterface
             foreach ($rowData as $key => $cellValue) {
                 if ($cellValue != null) {
                     // Set cell value
-                    $type = $this->getColumnType($key);
+                    $type = $this->getComplexColumnType($key);
+                    $cell = $sheet->getCell($currentColumn . $startRow);
                     if ($type != null) {
-                        $sheet->getCell($currentColumn . $startRow)->setValueExplicit($cellValue, $type);
+                        $cell->setValueExplicit($cellValue, $this->getColumnType($key));
+                        if ($type == ComplexWriterInterface::FORMAT_CURRENCY) {
+                            // TODO: Make Currency symbol configurable
+                            $cell->getStyle()->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+                        }
                     } else {
-                        $sheet->getCell($currentColumn . $startRow)->setValue($cellValue);
+                        $cell->setValue($cellValue);
                     }
                 }
                 ++$currentColumn;

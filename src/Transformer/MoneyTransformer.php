@@ -24,7 +24,7 @@ class MoneyTransformer implements TransformerInterface
     {
         foreach ($data as $key => $value) {
             if (is_numeric($value)) {
-                $data[$key] = str_replace('.', ',', strval($value/$this->divisor)).' '.$this->symbol;
+                $data[$key] = $value / $this->divisor;
             }
         }
 
