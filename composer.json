@@ -16,7 +16,7 @@
   "require": {
     "php": ">=7.4",
     "ext-pdo": "*",
-    "doctrine/dbal": "^2.12",
+    "doctrine/dbal": "^3.3",
     "doctrine/orm": "^2.8",
     "fresh/doctrine-enum-bundle": "^7.1",
     "gedmo/doctrine-extensions": "^3.0",
