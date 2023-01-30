@@ -18,7 +18,7 @@
     "ext-pdo": "*",
     "doctrine/dbal": "^3.3",
     "doctrine/orm": "^2.8",
-    "fresh/doctrine-enum-bundle": "^7.1",
+    "fresh/doctrine-enum-bundle": "^7.1 || ^9.0",
     "gedmo/doctrine-extensions": "^3.0",
     "giggsey/libphonenumber-for-php": "^8.12",
     "phpoffice/phpspreadsheet": "^1.17",
